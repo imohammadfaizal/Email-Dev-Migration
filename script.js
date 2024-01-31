@@ -3,19 +3,23 @@ var lineCountCache = 0;
 let code;
 const HTMLDocStandard = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">`;
+const iframeHTML = "<iframe id='my-iframe' height='1000'  class='w-100 ' ></iframe>"
 let wrapper = document.getElementById('wrapper');
 let iframes = document.getElementsByTagName('iframe');
 let m = iframes.length;
 let HREF;
 let newUrl;
 
-let handleSubmit = function () {
+let handleSubmit = async function () {
     code = document.getElementById("original-file").value;
-    wrapper.innerHTML = "<iframe id='my-iframe' height='1000'  class='w-100 '></iframe>";
-    document.getElementById("my-iframe").contentWindow.document.write(code);
-    setTimeout(() => {
-        handleEventsInAnchor();    
-    }, 1000);   
+    await jabaaz(code);
+    handleEventsInAnchor();    
+}
+
+function jabaaz(codeToUpdate){
+    wrapper.innerHTML = iframeHTML;
+    document.getElementById("my-iframe").contentWindow.document.write(codeToUpdate);
+    return codeToUpdate;
 }
 
 let handleEventsInAnchor = function() {
@@ -25,14 +29,14 @@ let handleEventsInAnchor = function() {
     for (let d = 0; d < HREF.length; d++) {
         HREF[d].addEventListener("click", (evt)=>{
             evt.preventDefault();
-            $(".hidden-modal").click();
+            $(".hidden-link-modal").click();
             $("#current-url").val(evt.currentTarget.href);
             newUrl=HREF[d];
         })
     }
 }
 
-let handleExtraction = function () {
+let handleExtraction = async function () {
     let IMGmatches = new Set();
     let j;
     for (j = 0; j < m; j++) {
@@ -46,27 +50,64 @@ let handleExtraction = function () {
         }
     }
     $(".image-picker").html('');
+    await populateImageGallery(IMGmatches);
+    handleImageUpdate();  
+}
+
+let populateImageGallery = function (IMGmatches){
     for (let idx in [...IMGmatches]) {
         $(".image-picker").append('<option data-img-src="' + [...IMGmatches][idx] + '">' + [...IMGmatches][idx] + '</option>')
     }
     $(".image-picker").imagepicker({
         hide_select: true
     });
-    // downloadResource('https://images.harmony.epsilon.com/ContentHandler/images/263f4ea1-4cf5-4c5e-a8d9-ae73663e97af/20201636_Inclisiran_Unbranded_Consumer_2020_FF_Campaign/148868_images/148868_XIN_CRM_Unbranded_Market-Prep_T4_01.png');   
+    return IMGmatches;
 }
 
-$("#save-changes").click(()=>{
-    if($("#new-url").val()) newUrl.href=$("#new-url").val();
-    if($("#alias").val()) newUrl.setAttribute("alias",$("#alias").val());
+let handleImageUpdate = function(){
+    $(".image_picker_image").click(function(){
+        $("#updated-image-url").val("");
+        $("#updated-image").attr("src","")
+        $(".hidden-image-modal").click();
+        $("#original-image").attr("src",this.src);
+        $("#original-image-url").text(this.src)
+    })        
+}
+
+$("#save-changes-image").click( () => {
+    for (let j = 0; j < m; j++) {
+        let IMGelems = iframes[j].contentDocument.getElementsByTagName("img");
+        let IMGBgelems = iframes[j].contentDocument.getElementsByTagName("td");
+        for (let d = 0; d < IMGelems.length; d++) {
+            if(IMGelems[d].src == $("#original-image-url").val()){
+                IMGelems[d].src = $("#updated-image-url").val();
+            }
+        }
+        for (let d = 0; d < IMGBgelems.length; d++) {
+            let bgImage = IMGBgelems[d].getAttribute("background");
+            if(bgImage && bgImage == $("#original-image-url").val()){
+                IMGBgelems[d].setAttribute("background",$("#updated-image-url").val());
+                let imageURL = 'url("'+$("#updated-image-url").val()+'")'
+                IMGBgelems[d].style.backgroundImage = imageURL;
+                let modifiedHTML = document.querySelector("iframe").contentDocument.documentElement.outerHTML.replaceAll($("#original-image-url").val(), $("#updated-image-url").val());
+                modifiedCode.value = HTMLDocStandard + "\n" + modifiedHTML;
+                wrapper.innerHTML = iframeHTML;
+                document.getElementById("my-iframe").contentWindow.document.write(modifiedCode.value);
+                line_counter('modified');
+                // setTimeout(() => {
+                //     handleEventsInAnchor();    
+                // }, 1000);
+            }
+        }
+    }
     modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
     line_counter('modified');
 })
 
 let handleHREFTrack = function () {
-
     for (let d = 0; d < HREF.length; d++) {
         let HREFTag = HREF[d].href;
-        if (HREFTag) {
+        if (HREFTag && HREFTag !== regexCall(HREFTag)) {
             HREF[d].href = regexCall(HREFTag);
         }
     }
@@ -74,27 +115,12 @@ let handleHREFTrack = function () {
     line_counter('modified');
 }
 
-let handleAmpscript = function () {
-    let iFramecode = document.querySelector("iframe").contentDocument.documentElement.outerHTML;
-    let regex = iFramecode.match(new RegExp(/\[\#if.*/gs))[0].match(new RegExp(/\[\#if(.*?)(\/\#if\])/gs))
-    modifiedCode.value = HTMLDocStandard + "\n" + iFramecode.replace(regex[0], "");
-    wrapper.innerHTML = "<iframe id='my-iframe' height='1000'  class='w-100 ' ></iframe>";
-    document.getElementById("my-iframe").contentWindow.document.write(modifiedCode.value);
+$("#save-changes-url").click(()=>{
+    if($("#new-url").val()) newUrl.href=$("#new-url").val();
+    if($("#alias").val()) newUrl.setAttribute("alias",$("#alias").val());
+    modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
     line_counter('modified');
-    setTimeout(() => {
-        handleEventsInAnchor();    
-    }, 1000);
-}
-
-$('#download-btn').click(function (e) {
-    e.preventDefault();
-    const link = document.createElement("a");
-    const file = new Blob([modifiedCode.value], { type: 'text/plain' });
-    link.href = URL.createObjectURL(file);
-    link.download = "index.html";
-    link.click();
-    URL.revokeObjectURL(link.href);
-});
+})
 
 let regexCall = function (strToMatch) {
     let regex = strToMatch.match(new RegExp(/https(.*?)(?=\?utm)/gs));
@@ -107,6 +133,32 @@ let regexCall = function (strToMatch) {
     }
     return strToMatch;
 }
+
+let handleAmpscript = function () {
+    let iFramecode = document.querySelector("iframe").contentDocument.documentElement.outerHTML;
+    let regex = iFramecode.match(new RegExp(/\[\#if.*/gs))[0].match(new RegExp(/\[\#if(.*?)(\/\#if\])/gs))
+    modifiedCode.value = HTMLDocStandard + "\n" + iFramecode.replace(regex[0], "");
+    wrapper.innerHTML = iframeHTML;
+    document.getElementById("my-iframe").contentWindow.document.write(modifiedCode.value);
+    line_counter('modified');
+    setTimeout(() => {
+        handleEventsInAnchor();    
+    }, 1000);
+}
+
+$("#updated-image-url").keyup(()=>{
+    $("#updated-image").attr("src",$("#updated-image-url").val());
+})
+
+$('#download-btn').click(function (e) {
+    e.preventDefault();
+    const link = document.createElement("a");
+    const file = new Blob([modifiedCode.value], { type: 'text/plain' });
+    link.href = URL.createObjectURL(file);
+    link.download = "index.html";
+    link.click();
+    URL.revokeObjectURL(link.href);
+});
 
 function line_counter(ele) {
     var lineCount = document.getElementById(`${ele}-file`).value.split('\n').length;
@@ -137,20 +189,3 @@ let handleToggleScreen = function(evt){
         $("#wrapper").width("100%");
     }
 }
-
-
-// let k = 0;
-//     setInterval(function(){
-//     if(IMGmatches.size > k){            
-//         var link = document.createElement("a");      
-//         link.id=k;        
-//         link.download = [...IMGmatches][k];        
-//         link.href = [...IMGmatches][k];        
-//         link.target = "_blank";        
-//         link.click();        
-//         // let regex = /(?<=\/)[^\/\?#]+(?=[^\/]*$)/;        
-//         // let fileName = regex.exec(IMGmatches[k].src); 
-//         // downloadResource([...IMGmatches][k]);
-//         k++;    
-//     }},1500);
-

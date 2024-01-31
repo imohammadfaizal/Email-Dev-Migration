@@ -14,6 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/image-picker/0.3.1/image-picker.min.js"
     integrity="sha512-76tAVeQq8wkwtFWzKPU03XJGMF/mcLDeBgi9wIlRICXdkLNUYVBiOL3O/R9Bold+u0eN0OUftCcBTjFkchPyBg=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
     <title>Document</title>
     <style>
         .thumbnails {
@@ -22,7 +23,11 @@
             gap: 10px;
             justify-content: space-evenly;
         }
-        .thumbnail{
+        .image-container {
+            background: url(./images/bg_check.avif);
+            background-size: cover;
+        }
+        .thumbnail {
             background: url(./images/bg_check.avif);
             background-size: contain;
         }
@@ -92,6 +97,12 @@
 			#codeEditor:focus-visible {
 			    outline:none;
 			}
+            #original-image-url, #updated-image-url{
+                font-family: lucida console, courier new, courier, monospace;
+                font-size: 10px;
+			    line-height: 1.2;
+                resize: none;
+            }
       </style>
 </head>
 <body>
@@ -152,12 +163,12 @@
                 </div>
             </div>
         </div>
-        <button type="button" class="btn btn-primary hidden-modal" data-bs-toggle="modal" data-bs-target="#exampleModal" style="display: none;">Launch demo modal</button>
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <button type="button" class="btn btn-primary hidden-link-modal" data-bs-toggle="modal" data-bs-target="#linkUpdateModal" style="display: none;">Launch demo modal</button>
+        <div class="modal fade" id="linkUpdateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                  <h5 class="modal-title" id="exampleModalLabel">Update Your Link</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body d-flex flex-column justify-content-between gap-1">
@@ -176,7 +187,46 @@
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="save-changes" >Save changes</button>
+                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="save-changes-url" >Save changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary hidden-image-modal" data-bs-toggle="modal" data-bs-target="#imageUpdateModal" style="display: none;">Launch demo modal</button>
+          <div class="modal fade" id="imageUpdateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Update Your Link</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex flex-column justify-content-between gap-1">
+                    <div class="d-flex gap-2 flex-column">
+                        <div class="d-flex gap-2">
+                            <h5 class="w-50">Original Image</h5>
+                            <h5 class="w-50">Updated Image</h5>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="image-container w-50 border d-flex justify-content-center">
+                                <img id="original-image" class="col-6" src="" alt="">
+                            </div>
+                            <div class="image-container w-50 border d-flex justify-content-center">
+                                <img id="updated-image" class="col-6" src="" alt="">
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="w-50">
+                                <textarea name="" id="original-image-url" class="w-100"  rows="4" readonly></textarea>
+                            </div>
+                            <div class="w-50">
+                                <textarea name="" id="updated-image-url" class="w-100"  rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="save-changes-image" >Save changes</button>
                 </div>
               </div>
             </div>
