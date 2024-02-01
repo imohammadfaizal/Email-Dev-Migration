@@ -10,16 +10,16 @@ let m = iframes.length;
 let HREF;
 let newUrl;
 
-let handleSubmit = async function () {
-    code = document.getElementById("original-file").value;
-    await jabaaz(code);
-    handleEventsInAnchor();    
-}
-
-function jabaaz(codeToUpdate){
+function iframeCodeUpdate(codeToUpdate){
     wrapper.innerHTML = iframeHTML;
     document.getElementById("my-iframe").contentWindow.document.write(codeToUpdate);
     return codeToUpdate;
+}
+
+let handleSubmit = async function () {
+    code = document.getElementById("original-file").value;
+    await iframeCodeUpdate(code);
+    handleEventsInAnchor();    
 }
 
 let handleEventsInAnchor = function() {
@@ -74,13 +74,14 @@ let handleImageUpdate = function(){
     })        
 }
 
-$("#save-changes-image").click( () => {
+$("#save-changes-image").click( async () => {
     for (let j = 0; j < m; j++) {
         let IMGelems = iframes[j].contentDocument.getElementsByTagName("img");
         let IMGBgelems = iframes[j].contentDocument.getElementsByTagName("td");
         for (let d = 0; d < IMGelems.length; d++) {
             if(IMGelems[d].src == $("#original-image-url").val()){
                 IMGelems[d].src = $("#updated-image-url").val();
+                modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
             }
         }
         for (let d = 0; d < IMGBgelems.length; d++) {
@@ -89,18 +90,12 @@ $("#save-changes-image").click( () => {
                 IMGBgelems[d].setAttribute("background",$("#updated-image-url").val());
                 let imageURL = 'url("'+$("#updated-image-url").val()+'")'
                 IMGBgelems[d].style.backgroundImage = imageURL;
-                let modifiedHTML = document.querySelector("iframe").contentDocument.documentElement.outerHTML.replaceAll($("#original-image-url").val(), $("#updated-image-url").val());
-                modifiedCode.value = HTMLDocStandard + "\n" + modifiedHTML;
-                wrapper.innerHTML = iframeHTML;
-                document.getElementById("my-iframe").contentWindow.document.write(modifiedCode.value);
-                line_counter('modified');
-                // setTimeout(() => {
-                //     handleEventsInAnchor();    
-                // }, 1000);
+                modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML.replaceAll($("#original-image-url").val(), $("#updated-image-url").val());
             }
         }
     }
-    modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
+    await iframeCodeUpdate(modifiedCode.value)
+    handleEventsInAnchor();    
     line_counter('modified');
 })
 
@@ -134,16 +129,13 @@ let regexCall = function (strToMatch) {
     return strToMatch;
 }
 
-let handleAmpscript = function () {
-    let iFramecode = document.querySelector("iframe").contentDocument.documentElement.outerHTML;
-    let regex = iFramecode.match(new RegExp(/\[\#if.*/gs))[0].match(new RegExp(/\[\#if(.*?)(\/\#if\])/gs))
-    modifiedCode.value = HTMLDocStandard + "\n" + iFramecode.replace(regex[0], "");
-    wrapper.innerHTML = iframeHTML;
-    document.getElementById("my-iframe").contentWindow.document.write(modifiedCode.value);
+let handleAmpscript = async function () {
+    let iFrameCode = document.querySelector("iframe").contentDocument.documentElement.outerHTML;
+    let regex = iFrameCode.match(new RegExp(/\[\#if.*/gs))[0].match(new RegExp(/\[\#if(.*?)(\/\#if\])/gs))
+    modifiedCode.value = HTMLDocStandard + "\n" + iFrameCode.replaceAll(regex[0], "");
+    await iframeCodeUpdate(modifiedCode.value);
+    handleEventsInAnchor();    
     line_counter('modified');
-    setTimeout(() => {
-        handleEventsInAnchor();    
-    }, 1000);
 }
 
 $("#updated-image-url").keyup(()=>{
