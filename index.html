@@ -14,8 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/image-picker/0.3.1/image-picker.min.js"
     integrity="sha512-76tAVeQq8wkwtFWzKPU03XJGMF/mcLDeBgi9wIlRICXdkLNUYVBiOL3O/R9Bold+u0eN0OUftCcBTjFkchPyBg=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
-    <title>Document</title>
+    <title>Email Dev Migration</title>
     <style>
         .thumbnails {
             display: flex;
@@ -58,7 +57,7 @@
 				font-family: lucida console, courier new, courier, monospace;
 				margin: 0;
 			    padding: 10px 0;
-			    height: 50vh;
+			    height: 305px;
 			    border-radius: 0;
 			    resize: none;
 			    font-size: 10px;
@@ -107,7 +106,7 @@
 </head>
 <body>
     <div class="container-fluid">
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-1">
             <div class="d-flex flex-column align-items-center col-5">
                 <h3 style="font-family: 'Roboto Slab', serif;">Original Code</h3>
                 <div class="editor w-100">
@@ -116,7 +115,6 @@
                         <textarea class="codeTextarea" style="border-radius: 5px;" oninput="line_counter('original')" onscroll="line_scroll('original')" id="original-file" placeholder="Please paste the original code here..."  wrap='off' ></textarea>
                     </div>
                 </div>
-                <!-- <textarea id="original-file" class="w-100 rounded" placeholder="Please paste the original code here..." rows="15" style="font-family: 'Source Code Pro', monospace; font-size: 10px;"></textarea> -->
             </div>
             <div class="d-flex flex-column col-2">
                 <h3 style="visibility: hidden;" >Haha</h3>
@@ -125,7 +123,8 @@
                 <button onclick="handleExtraction()" class="btn btn-dark" title="Extract Images in Image Preview Tab">Extract Images</button>
                 <button onclick="handleHREFTrack()" class="btn btn-dark" title="Removes Tracking URL from HREF Attribute">Remove Tracking URL</button>
                 <button onclick="handleAmpscript()" class="btn btn-dark" title="Removes Unwanted Ampscript">Remove Ampscript</button>
-                <a id="download-btn" href="no-script.html" class="btn btn-dark" title="Downloads Modified HTML file">Download HTML</a>
+                <a id="download-btn" href="no-script.html" class="btn btn-dark disabled" title="Downloads Modified HTML file" disabled >Download HTML</a>
+                <button onclick="handleToggleScreen(this)" data-bool="mobile" title="Toggles iFrame to Mobile Screen" class="btn btn-danger" title="Toggle Screen Sizes">Toggle to Mobile Screen</button>
                 </div>
             </div>
             <div class="d-flex flex-column align-items-center col-5">
@@ -136,21 +135,12 @@
                         <textarea class="codeTextarea" style="border-radius: 5px;" oninput="line_counter('modified')" onscroll="line_scroll('modified')"  id='modified-file' wrap='off' ></textarea>
                     </div>
                 </div>
-                <!-- <textarea id="modified-file" class="w-100 rounded" style="font-family: 'Source Code Pro', monospace; font-size: 10px;"></textarea> -->
             </div>
         </div>
-        <!-- <div class="d-flex justify-content-center pt-3 pb-3 gap-3">
-            <button onclick="handleSubmit()" class="btn btn-dark" title="Submit to Generate Preview">Submit</button>
-            <button onclick="handleExtraction()" class="btn btn-dark" title="Extract Images in Image Preview Tab">Extract Images</button>
-            <button onclick="handleHREFTrack()" class="btn btn-dark" title="Removes Tracking URL from HREF Attribute">Remove Tracking URL</button>
-            <button onclick="handleAmpscript()" class="btn btn-dark" title="Removes Unwanted Ampscript">Remove Ampscript</button>
-            <a id="download-btn" href="no-script.html" class="btn btn-dark" title="Downloads Modified HTML file">Download HTML</a>
-        </div> -->
         <div class="d-flex gap-1">
             <div class="d-flex flex-column align-items-center w-50">
                 <h3 class="m-0 pb-3" style="font-family: 'Roboto Slab', serif;">Email Preview</h3>
                 <div class="w-100 border rounded d-flex flex-column justify-content-center align-items-center">
-                    <!-- <button onclick="handleToggleScreen(this)" data-bool="mobile" class="btn btn-dark w-50 my-2" title="Toggle Screen Sizes">Toggle to Mobile Screen</button> -->
                     <div id="wrapper" class="align-self-center" style="width: 100%;" >
                         <iframe id="my-iframe" height="1000" class="w-100"></iframe>
                     </div>

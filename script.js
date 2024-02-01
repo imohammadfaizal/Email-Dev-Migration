@@ -13,13 +13,20 @@ let newUrl;
 function iframeCodeUpdate(codeToUpdate){
     wrapper.innerHTML = iframeHTML;
     document.getElementById("my-iframe").contentWindow.document.write(codeToUpdate);
+    line_counter('modified'); 
+    disableDownload();
     return codeToUpdate;
 }
 
 let handleSubmit = async function () {
+    modifiedCode.value="";
+    $(".image-picker").html('');
+    $(".image-picker").imagepicker({
+        hide_select: true
+    });
     code = document.getElementById("original-file").value;
     await iframeCodeUpdate(code);
-    handleEventsInAnchor();    
+    handleEventsInAnchor();
 }
 
 let handleEventsInAnchor = function() {
@@ -96,7 +103,7 @@ $("#save-changes-image").click( async () => {
     }
     await iframeCodeUpdate(modifiedCode.value)
     handleEventsInAnchor();    
-    line_counter('modified');
+    handleExtraction();
 })
 
 let handleHREFTrack = function () {
@@ -108,6 +115,7 @@ let handleHREFTrack = function () {
     }
     modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
     line_counter('modified');
+    disableDownload();
 }
 
 $("#save-changes-url").click(()=>{
@@ -115,6 +123,7 @@ $("#save-changes-url").click(()=>{
     if($("#alias").val()) newUrl.setAttribute("alias",$("#alias").val());
     modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
     line_counter('modified');
+    disableDownload();
 })
 
 let regexCall = function (strToMatch) {
@@ -134,13 +143,21 @@ let handleAmpscript = async function () {
     let regex = iFrameCode.match(new RegExp(/\[\#if.*/gs))[0].match(new RegExp(/\[\#if(.*?)(\/\#if\])/gs))
     modifiedCode.value = HTMLDocStandard + "\n" + iFrameCode.replaceAll(regex[0], "");
     await iframeCodeUpdate(modifiedCode.value);
-    handleEventsInAnchor();    
-    line_counter('modified');
+    handleEventsInAnchor();
 }
 
 $("#updated-image-url").keyup(()=>{
     $("#updated-image").attr("src",$("#updated-image-url").val());
 })
+
+function disableDownload() {
+    if(modifiedCode.value==""){
+        $('#download-btn').addClass("disabled");
+    }
+    else{
+        $('#download-btn').removeClass("disabled");
+    }
+}
 
 $('#download-btn').click(function (e) {
     e.preventDefault();
@@ -174,10 +191,12 @@ let handleToggleScreen = function(evt){
         evt.innerHTML="Toggle to Desktop Screen";
         evt.dataset.bool="desktop";
         $("#wrapper").width("425px");
+        evt.setAttribute("title","Toggles iFrame to Desktop Screen");
     }
     else{ 
         evt.innerHTML="Toggle to Mobile Screen";
         evt.dataset.bool="mobile";
         $("#wrapper").width("100%");
+        evt.setAttribute("title","Toggles iFrame to Mobile Screen");
     }
 }
