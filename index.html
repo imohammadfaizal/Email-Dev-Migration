@@ -101,7 +101,16 @@
                 font-size: 10px;
 			    line-height: 1.2;
                 resize: none;
+                border: 1px solid #c18e8e;
             }
+            #new-url::placeholder, #alias::placeholder, #current-url::placeholder, #updated-image-url::placeholder, #updated-image-alt::placeholder{
+                /* color: #dddbdb; */
+                color: #c5bebe;
+            }
+            .fs-7{
+                font-size: small;
+            }
+
       </style>
 </head>
 <body>
@@ -162,18 +171,18 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body d-flex flex-column justify-content-between gap-1">
-                    <div class="d-flex justify-content-between row">
-                        <label class="col-3">Current URL: </label>
-                        <input type="text" class="col-9" id="current-url">
-                    </div>
-                    <div class="d-flex justify-content-between row">
-                        <label class="col-3">New URL: </label>
-                        <input type="text" class="col-9" id="new-url" required>
-                    </div>
-                    <div class="d-flex justify-content-between row">
-                        <label class="col-3">Alias: </label>
-                        <input type="text" class="col-9" id="alias" required>
-                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text col-3 fw-bold" id="basic-addon1">Current URL:</span>
+                        <input type="text" class="form-control col-9 fs-7" type="url" id="current-url" readonly aria-describedby="basic-addon1">
+                      </div>
+                      <div class="input-group">
+                        <span class="input-group-text col-3 fw-bold" id="basic-addon1">New URL:</span>
+                        <input type="text" class="form-control col-9 fs-7" id="new-url" placeholder="Enter new link here..." aria-label="Enter new link here..." aria-describedby="basic-addon1">
+                      </div>
+                      <div class="input-group">
+                        <span class="input-group-text col-3 fw-bold" id="basic-addon1">Alias:</span>
+                        <input type="text" class="form-control col-9 fs-7" id="alias" placeholder="Enter new alias here..." aria-label="Enter new alias here..." aria-describedby="basic-addon1">
+                      </div>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -187,14 +196,14 @@
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Update Your Link</h5>
+                  <h5 class="modal-title fw-bold" id="exampleModalLabel">Update Your Link</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body d-flex flex-column justify-content-between gap-1">
                     <div class="d-flex gap-2 flex-column">
                         <div class="d-flex gap-2">
-                            <h5 class="w-50">Original Image</h5>
-                            <h5 class="w-50">Updated Image</h5>
+                            <h5 class="w-50 m-0 text-center">Original Image</h5>
+                            <h5 class="w-50 m-0 text-center">Updated Image</h5>
                         </div>
                         <div class="d-flex gap-2">
                             <div class="image-container w-50 border d-flex justify-content-center">
@@ -206,18 +215,18 @@
                         </div>
                         <div class="d-flex gap-2">
                             <div class="w-50">
-                                <textarea name="" id="original-image-url" class="w-100 h-100"  rows="3" readonly></textarea>
+                                <textarea name="" id="original-image-url" class="w-100 h-100 form-control"  rows="3" readonly></textarea>
                             </div>
                             <div class="w-50">
-                                <textarea name="" id="updated-image-url" class="w-100 h-100"  rows="3" placeholder="Paste new link here..."></textarea>
+                                <textarea name="" id="updated-image-url" class="w-100 h-100 form-control"  rows="3" placeholder="Paste new link here..."></textarea>
                             </div>
                         </div>
                         <div class="d-flex gap-2">
                             <div class="w-50">
-                                <textarea name="" id="original-image-alt" class="w-100"  rows="1" readonly></textarea>
+                                <textarea name="" id="original-image-alt" class="w-100 form-control"  rows="1" readonly></textarea>
                             </div>
                             <div class="w-50">
-                                <textarea name="" id="updated-image-alt" class="w-100"  rows="1" placeholder="Paste new alt text here..."></textarea>
+                                <textarea name="" id="updated-image-alt" class="w-100 form-control"  rows="1" placeholder="Paste new alt text here..."></textarea>
                             </div>
                         </div>
                     </div>
