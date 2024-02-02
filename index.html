@@ -96,7 +96,7 @@
 			#codeEditor:focus-visible {
 			    outline:none;
 			}
-            #original-image-url, #updated-image-url{
+            #original-image-url, #updated-image-url, #original-image-alt, #updated-image-alt{
                 font-family: lucida console, courier new, courier, monospace;
                 font-size: 10px;
 			    line-height: 1.2;
@@ -137,17 +137,17 @@
                 </div>
             </div>
         </div>
-        <div class="d-flex gap-1">
+        <div class="d-flex gap-3">
             <div class="d-flex flex-column align-items-center w-50">
-                <h3 class="m-0 pb-3" style="font-family: 'Roboto Slab', serif;">Email Preview</h3>
+                <h3 class="m-0 pb-2" style="font-family: 'Roboto Slab', serif;">Email Preview</h3>
                 <div class="w-100 border rounded d-flex flex-column justify-content-center align-items-center">
-                    <div id="wrapper" class="align-self-center" style="width: 100%;" >
+                    <div id="wrapper" class="align-self-center" style="width: 100%; height: 1000px;" >
                         <iframe id="my-iframe" height="1000" class="w-100"></iframe>
                     </div>
                 </div>
             </div>
             <div class="d-flex flex-column align-items-center w-50 " >
-                <h3 class="m-0 pb-3" style="font-family: 'Roboto Slab', serif;">Image Preview</h3>
+                <h3 class="m-0 pb-2" style="font-family: 'Roboto Slab', serif;">Image Preview</h3>
                 <div class="picker w-100 border p-3 rounded" style="height: 1000px; overflow: scroll;">
                     <select class="image-picker show-html" style="display: none;"></select>
                 </div>
@@ -158,7 +158,7 @@
             <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Update Your Link</h5>
+                  <h5 class="modal-title fw-bold" id="exampleModalLabel">Update Your Link</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body d-flex flex-column justify-content-between gap-1">
@@ -206,10 +206,18 @@
                         </div>
                         <div class="d-flex gap-2">
                             <div class="w-50">
-                                <textarea name="" id="original-image-url" class="w-100"  rows="4" readonly></textarea>
+                                <textarea name="" id="original-image-url" class="w-100 h-100"  rows="3" readonly></textarea>
                             </div>
                             <div class="w-50">
-                                <textarea name="" id="updated-image-url" class="w-100"  rows="4"></textarea>
+                                <textarea name="" id="updated-image-url" class="w-100 h-100"  rows="3" placeholder="Paste new link here..."></textarea>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="w-50">
+                                <textarea name="" id="original-image-alt" class="w-100"  rows="1" readonly></textarea>
+                            </div>
+                            <div class="w-50">
+                                <textarea name="" id="updated-image-alt" class="w-100"  rows="1" placeholder="Paste new alt text here..."></textarea>
                             </div>
                         </div>
                     </div>

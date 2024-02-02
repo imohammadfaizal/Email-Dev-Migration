@@ -37,23 +37,25 @@ let handleEventsInAnchor = function() {
         HREF[d].addEventListener("click", (evt)=>{
             evt.preventDefault();
             $(".hidden-link-modal").click();
+            $("#new-url").val("");
             $("#current-url").val(evt.currentTarget.href);
             newUrl=HREF[d];
+            ((evt.currentTarget).outerHTML) ? $("#alias").val(evt.currentTarget.getAttribute("alias")) : $("#alias").val("");
         })
     }
 }
 
 let handleExtraction = async function () {
-    let IMGmatches = new Set();
+    let IMGmatches = new Map();
     let j;
     for (j = 0; j < m; j++) {
         let IMGelems = iframes[j].contentDocument.getElementsByTagName("img");
         let IMGBgelems = iframes[j].contentDocument.getElementsByTagName("td");
         for (let d = 0; d < IMGelems.length; d++) {
-            IMGmatches.add(IMGelems[d].src);
+            IMGmatches.set(IMGelems[d].src,IMGelems[d].alt);
         }
         for (let d = 0; d < IMGBgelems.length; d++) {
-            if (IMGBgelems[d].getAttribute("background")) IMGmatches.add(IMGBgelems[d].getAttribute("background"));
+            if (IMGBgelems[d].getAttribute("background")) IMGmatches.set(IMGBgelems[d].getAttribute("background"),"");
         }
     }
     $(".image-picker").html('');
@@ -62,8 +64,8 @@ let handleExtraction = async function () {
 }
 
 let populateImageGallery = function (IMGmatches){
-    for (let idx in [...IMGmatches]) {
-        $(".image-picker").append('<option data-img-src="' + [...IMGmatches][idx] + '">' + [...IMGmatches][idx] + '</option>')
+    for (let idx of [...IMGmatches]) {
+        $(".image-picker").append('<option data-img-src="' + idx[0] + '" <option data-img-alt="' + idx[1] + '">' + idx[0] + '</option>')
     }
     $(".image-picker").imagepicker({
         hide_select: true
@@ -74,10 +76,12 @@ let populateImageGallery = function (IMGmatches){
 let handleImageUpdate = function(){
     $(".image_picker_image").click(function(){
         $("#updated-image-url").val("");
+        $("#updated-image-alt").val("");
         $("#updated-image").attr("src","")
         $(".hidden-image-modal").click();
         $("#original-image").attr("src",this.src);
         $("#original-image-url").text(this.src)
+        $("#original-image-alt").text(this.alt);
     })        
 }
 
@@ -87,13 +91,14 @@ $("#save-changes-image").click( async () => {
         let IMGBgelems = iframes[j].contentDocument.getElementsByTagName("td");
         for (let d = 0; d < IMGelems.length; d++) {
             if(IMGelems[d].src == $("#original-image-url").val()){
-                IMGelems[d].src = $("#updated-image-url").val();
+                if($("#updated-image-url").val() !== ""){IMGelems[d].src = $("#updated-image-url").val()};
+                if($("#updated-image-alt").val() !== ""){IMGelems[d].alt = $("#updated-image-alt").val()};
                 modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
             }
         }
         for (let d = 0; d < IMGBgelems.length; d++) {
             let bgImage = IMGBgelems[d].getAttribute("background");
-            if(bgImage && bgImage == $("#original-image-url").val()){
+            if(bgImage && bgImage == $("#original-image-url").val() && $("#updated-image-url").val() !== ""){
                 IMGBgelems[d].setAttribute("background",$("#updated-image-url").val());
                 let imageURL = 'url("'+$("#updated-image-url").val()+'")'
                 IMGBgelems[d].style.backgroundImage = imageURL;
