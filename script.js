@@ -19,12 +19,13 @@ function iframeCodeUpdate(codeToUpdate){
 }
 
 let handleSubmit = async function () {
+    $("#submit-btn").addClass("disabled");
     modifiedCode.value="";
     $(".image-picker").html('');
     $(".image-picker").imagepicker({
         hide_select: true
     });
-    code = document.getElementById("original-file").value;
+    code = $("#original-file").val();
     await iframeCodeUpdate(code);
     handleEventsInAnchor();
 }
@@ -205,3 +206,43 @@ let handleToggleScreen = function(evt){
         evt.setAttribute("title","Toggles iFrame to Mobile Screen");
     }
 }
+
+function dropOverDropzone(ev) {
+    ev.preventDefault();
+    $("#drop-zone").css( "zIndex", -1 );
+    if (ev.dataTransfer.items){
+        [...ev.dataTransfer.items].forEach((item, i) => {
+            if (item.kind === "file" && item.type === "text/html") {
+                const file = item.getAsFile();
+                let reader = new FileReader();
+                let populateTextarea = (evt) => {
+                    $("#original-file").val(evt.target.result);
+                    line_counter('original');
+                    $("#submit-btn").removeClass("disabled");
+                }
+                let onReaderLoad = (file) => {
+                    return populateTextarea;
+                };
+                reader.onload = onReaderLoad(file);
+                reader.readAsText(file);
+            }
+        });
+    } 
+    // else {
+    //   [...ev.dataTransfer.files].forEach((file, i) => {
+    //     console.log(`file[${i}].name = ${file.name}`);
+    //   });
+    // }
+}
+function dragOverDropzone(evt) {
+    evt.preventDefault();
+}
+
+function dragOverTextarea(evt){
+    evt.preventDefault();
+    $("#drop-zone").css( "zIndex", 1000 );
+}
+
+$("#original-file").keyup(()=>{
+    $("#submit-btn").removeClass("disabled");
+})
