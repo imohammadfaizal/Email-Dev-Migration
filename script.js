@@ -178,13 +178,13 @@ $('#download-btn').click(function (e) {
     URL.revokeObjectURL(link.href);
 });
 
-function dropOverDropzone(ev) {
-    ev.preventDefault();
+function dropOverDropzone(evt) {
+    evt.preventDefault();
     $("#drop-zone").css( "zIndex", -1 );
     $("#drop-animation").addClass("d-none");
     $("#dummy-wrapper").addClass("d-none");
-    if (ev.dataTransfer.items){
-        [...ev.dataTransfer.items].forEach((item, i) => {
+    if (evt.dataTransfer.items){
+        [...evt.dataTransfer.items].forEach((item, i) => {
             if (item.kind === "file" && item.type === "text/html") {
                 const file = item.getAsFile();
                 readFile(file);
@@ -197,10 +197,16 @@ function dropOverDropzone(ev) {
 }
 
 
-function handleFileUpload( evt ) {
+function handleFileUpload(evt) {
     let file = evt.target.files[0];
-    fileToUpload = file;
-    $("#upload-btn").removeClass("disabled");
+    if(file.type === "text/html"){
+        fileToUpload = file;
+        $("#upload-btn").removeClass("disabled");
+    }
+    else{
+        $("#upload-btn").addClass("disabled");
+        handleToast('Please select a valid HTML File','error');
+    }
 }
 
 function handleFileUpdate() {
