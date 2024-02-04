@@ -9,6 +9,7 @@ let iframes = document.getElementsByTagName('iframe');
 let m = iframes.length;
 let HREF;
 let newUrl;
+let fileToUpload;
 document.getElementById('upload-file').addEventListener( 'change', handleFileUpload, false );
 $("#original-file").keyup(()=>{ $("#submit-btn").removeClass("disabled"); })
 
@@ -195,7 +196,6 @@ function dropOverDropzone(ev) {
     } 
 }
 
-let fileToUpload;
 
 function handleFileUpload( evt ) {
     let file = evt.target.files[0];
@@ -206,6 +206,7 @@ function handleFileUpload( evt ) {
 function handleFileUpdate() {
     $("#upload-btn").addClass("disabled");
     readFile(fileToUpload);
+    $("#dummy-wrapper").addClass("d-none");
 }
 
 function readFile(file){
