@@ -9,6 +9,8 @@ let iframes = document.getElementsByTagName('iframe');
 let m = iframes.length;
 let HREF;
 let newUrl;
+document.getElementById('upload-file').addEventListener( 'change', handleFileUpload, false );
+$("#original-file").keyup(()=>{ $("#submit-btn").removeClass("disabled"); })
 
 function iframeCodeUpdate(codeToUpdate){
     wrapper.innerHTML = iframeHTML;
@@ -175,6 +177,80 @@ $('#download-btn').click(function (e) {
     URL.revokeObjectURL(link.href);
 });
 
+function dropOverDropzone(ev) {
+    ev.preventDefault();
+    $("#drop-zone").css( "zIndex", -1 );
+    $("#drop-animation").addClass("d-none");
+    $("#dummy-wrapper").addClass("d-none");
+    if (ev.dataTransfer.items){
+        [...ev.dataTransfer.items].forEach((item, i) => {
+            if (item.kind === "file" && item.type === "text/html") {
+                const file = item.getAsFile();
+                readFile(file);
+            }
+            else{
+                handleToast('Please upload a valid HTML File','error');
+            }
+        });
+    } 
+}
+
+let fileToUpload;
+
+function handleFileUpload( evt ) {
+    let file = evt.target.files[0];
+    fileToUpload = file;
+    $("#upload-btn").removeClass("disabled");
+}
+
+function handleFileUpdate() {
+    $("#upload-btn").addClass("disabled");
+    readFile(fileToUpload);
+}
+
+function readFile(file){
+    let reader = new FileReader();
+    let populateTextarea = (evt) => {
+        $("#original-file").val(evt.target.result);
+        line_counter("original");
+        $("#submit-btn").removeClass("disabled");
+    }
+    let onReaderLoad = (file) => {
+        return populateTextarea;
+    };
+    reader.onload = onReaderLoad(file);
+    reader.readAsText(file);
+}
+
+function dragOverDropzone(evt) {
+    evt.preventDefault();
+}
+
+function dragOverTextarea(evt){
+    evt.preventDefault();
+    $("#drop-zone").css( "zIndex", 1000 );
+    $("#drop-animation").removeClass("d-none");
+    $("#dummy-wrapper").removeClass("d-none");
+}
+
+function dragLeaveDropzone(evt){
+    evt.preventDefault();
+    $("#drop-animation").addClass("d-none");
+    $("#drop-zone").css( "zIndex", -1 );
+    $("#dummy-wrapper").removeClass("d-none");
+}
+
+let handleToast = function (toastMessage, toastType) {
+    $.toast({
+        text: toastMessage,
+        position: 'bottom-right',
+        icon: toastType,
+        stack: 5,
+        loader: false,
+        hideAfter: 4000
+    })
+}
+
 function line_counter(ele) {
     var lineCount = document.getElementById(`${ele}-file`).value.split('\n').length;
     var outarr = new Array();
@@ -207,52 +283,6 @@ let handleToggleScreen = function(evt){
     }
 }
 
-function dropOverDropzone(ev) {
-    ev.preventDefault();
-    $("#drop-zone").css( "zIndex", -1 );
-    $("#drop-animation").addClass("d-none");
-    $("#dummy-wrapper").addClass("d-none");
-    if (ev.dataTransfer.items){
-        [...ev.dataTransfer.items].forEach((item, i) => {
-            if (item.kind === "file" && item.type === "text/html") {
-                const file = item.getAsFile();
-                let reader = new FileReader();
-                let populateTextarea = (evt) => {
-                    $("#original-file").val(evt.target.result);
-                    line_counter('original');
-                    $("#submit-btn").removeClass("disabled");
-                }
-                let onReaderLoad = (file) => {
-                    return populateTextarea;
-                };
-                reader.onload = onReaderLoad(file);
-                reader.readAsText(file);
-            }
-        });
-    } 
-}
-function dragOverDropzone(evt) {
-    evt.preventDefault();
-}
-
-function dragOverTextarea(evt){
-    evt.preventDefault();
-    $("#drop-zone").css( "zIndex", 1000 );
-    $("#drop-animation").removeClass("d-none");
-    $("#dummy-wrapper").removeClass("d-none");
-}
-
-function dragLeaveDropzone(evt){
-    evt.preventDefault();
-    $("#drop-animation").addClass("d-none");
-    $("#drop-zone").css( "zIndex", -1 );
-    $("#dummy-wrapper").removeClass("d-none");
-}
-
-$("#original-file").keyup(()=>{
-    $("#submit-btn").removeClass("disabled");
-})
-
 window.addEventListener("dragover",function(e){
     e.preventDefault();
     if (e.target.id !== "drop-zone") {
@@ -260,6 +290,7 @@ window.addEventListener("dragover",function(e){
         e.dataTransfer.dropEffect = 'none';
     }
 }, false);
+
 window.addEventListener("drop",function(e){
     e.preventDefault();
 }, false);

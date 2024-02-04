@@ -14,6 +14,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/image-picker/0.3.1/image-picker.min.js"
     integrity="sha512-76tAVeQq8wkwtFWzKPU03XJGMF/mcLDeBgi9wIlRICXdkLNUYVBiOL3O/R9Bold+u0eN0OUftCcBTjFkchPyBg=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"></script>
     <title>Email Dev Migration</title>
     <style>
         .thumbnails {
@@ -51,6 +53,15 @@
             background: rgb(126, 126, 126);
             cursor: pointer !important;
         }
+        .jq-toast-wrap.bottom-right {
+         bottom: 10px !important;
+         right: 10px !important;
+        }  
+        .close-jq-toast-single {
+         right: 5px !important;
+         font-size: 18px !important;
+         top: 2px !important;
+        }
     </style>
     <style>
             .lineTextarea, .codeTextarea{
@@ -70,6 +81,9 @@
                 overflow-y: scroll;
                 scrollbar-gutter: stable;
 			}
+            .h-header{
+                height: 305px;
+            }
 			.codeTextarea {
 			    padding-left: calc(2rem + 5px);
 			    width:100%;
@@ -151,7 +165,7 @@
             <div class="d-flex flex-column align-items-center col-5">
                 <h3 style="font-family: 'Roboto Slab', serif;">Original Code</h3>
                 <div class="editor w-100 position-relative">
-                    <div class="rounded" style="height: 305px;" >
+                    <div class="rounded h-header" >
                         <textarea class="lineTextarea" id="original-line-counter" style="border-radius: 5px;"   wrap='off' readonly>1.</textarea>
                         <textarea class="codeTextarea" style="border-radius: 5px;" oninput="line_counter('original')" onscroll="line_scroll('original')" id="original-file" placeholder="Please paste the original code here..."  wrap='off' ondragover="dragOverTextarea(event);" ></textarea>
                     </div>
@@ -160,7 +174,7 @@
                         </div>
                         <div id="drop-animation" class="position-absolute top-0 w-100 h-100 d-none" >
                             <div id="upload-icon" class="position-absolute">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"/></svg>
                             </div>
                             <div class="position-absolute bottom-25 left-50 fw-bolder" id="upload-text" >Drop HTML file here to upload your code.</div>
                         </div>
@@ -169,19 +183,23 @@
             </div>
             <div class="d-flex flex-column col-2">
                 <h3 style="visibility: hidden;" >Haha</h3>
-                <div class="d-flex flex-column gap-3" >
+                <div class="d-flex flex-column justify-content-between h-header" >
                     <button onclick="handleSubmit()" class="btn btn-dark disabled" id="submit-btn" title="Submit to Generate Preview">Submit</button>
+                    <a id="download-btn" href="no-script.html" class="btn btn-dark disabled" title="Downloads Modified HTML file" disabled >Download HTML</a>
                     <button onclick="handleExtraction()" class="btn btn-dark" title="Extract Images in Image Preview Tab">Extract Images</button>
                     <button onclick="handleHREFTrack()" class="btn btn-dark" title="Removes Tracking URL from HREF Attribute">Remove Tracking URL</button>
                     <button onclick="handleAmpscript()" class="btn btn-dark" title="Removes Unwanted Ampscript">Remove Ampscript</button>
-                    <a id="download-btn" href="no-script.html" class="btn btn-dark disabled" title="Downloads Modified HTML file" disabled >Download HTML</a>
                     <button onclick="handleToggleScreen(this)" data-bool="mobile" title="Toggles iFrame to Mobile Screen" class="btn btn-danger" title="Toggle Screen Sizes">Toggle to Mobile Screen</button>
+                    <div class="input-group">
+                        <input type="file" class="form-control" id="upload-file" aria-describedby="upload-btn" aria-label="Upload">
+                        <button class="btn btn-dark disabled" type="button" id="upload-btn" onclick="handleFileUpdate()" ><svg style="width: 19px; fill: white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M288 109.3V352c0 17.7-14.3 32-32 32s-32-14.3-32-32V109.3l-73.4 73.4c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l128-128c12.5-12.5 32.8-12.5 45.3 0l128 128c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L288 109.3zM64 352H192c0 35.3 28.7 64 64 64s64-28.7 64-64H448c35.3 0 64 28.7 64 64v32c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V416c0-35.3 28.7-64 64-64zM432 456a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg></button>
+                    </div>
                 </div>
             </div>
             <div class="d-flex flex-column align-items-center col-5">
                 <h3 style="font-family: 'Roboto Slab', serif;">Modified Code</h3>
                 <div class="editor w-100">
-                    <div class="rounded" style="height: 305px;" >
+                    <div class="rounded h-header" >
                         <textarea class="lineTextarea" id='modified-line-counter' style="border-radius: 5px;"  wrap='off' readonly>1.</textarea>
                         <textarea class="codeTextarea" style="border-radius: 5px;" oninput="line_counter('modified')" onscroll="line_scroll('modified')"  id='modified-file' wrap='off' ></textarea>
                     </div>
