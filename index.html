@@ -112,6 +112,10 @@
             }
             #drop-zone {
                 z-index: -1;
+                /* background-color: #3a3a3adb; */
+                border-radius: 5px;
+            }
+            #drop-animation {
                 background-color: #3a3a3adb;
                 border-radius: 5px;
             }
@@ -121,9 +125,7 @@
                 left: 50%;
                 top: 50%;
                 transform: translate(-50%, -50%);
-                animation-name: example;
-                animation-duration: 1s;
-                animation-iteration-count: 30;
+                animation: upload 1s infinite reverse ease-out;
             }
             #upload-text {
                 color: #b3f3f5d4;
@@ -133,11 +135,11 @@
                 width: 393px;
                 transform: translate(-50%, -50%);
             }
-            @keyframes example {
+            @keyframes upload {
                 0%   {left: 50%; top: 50%; transform: translate(-50%, -50%); }
-                25%  {left: 50%; top: 55%; transform: translate(-50%, -50%); }
+                /* 25%  {left: 50%; top: 55%; transform: translate(-50%, -50%); } */
                 50%  {left: 50%; top: 55%; transform: translate(-50%, -50%); }
-                75%  {left: 50%; top: 55%; transform: translate(-50%, -50%); }
+                /* 75%  {left: 50%; top: 55%; transform: translate(-50%, -50%); } */
                 100% {left: 50%; top: 50%; transform: translate(-50%, -50%); }
             }
 
@@ -153,11 +155,15 @@
                         <textarea class="lineTextarea" id="original-line-counter" style="border-radius: 5px;"   wrap='off' readonly>1.</textarea>
                         <textarea class="codeTextarea" style="border-radius: 5px;" oninput="line_counter('original')" onscroll="line_scroll('original')" id="original-file" placeholder="Please paste the original code here..."  wrap='off' ondragover="dragOverTextarea(event);" ></textarea>
                     </div>
-                    <div id="drop-zone" class="position-absolute w-100 h-100 top-0" ondrop="dropOverDropzone(event);" ondragover="dragOverDropzone(event);" >
-                        <div id="upload-icon" class="position-absolute">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"/></svg>
+                    <div>
+                        <div id="drop-zone" class="position-absolute w-100 h-100 top-0" ondrop="dropOverDropzone(event);" ondragover="dragOverDropzone(event);" ondragleave="dragLeaveDropzone(event)" >
                         </div>
-                        <div class="position-absolute bottom-25 left-50 fw-bolder" id="upload-text" >Drop HTML file here to upload your code.</div>
+                        <div id="drop-animation" class="position-absolute top-0 w-100 h-100 d-none" >
+                            <div id="upload-icon" class="position-absolute">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"/></svg>
+                            </div>
+                            <div class="position-absolute bottom-25 left-50 fw-bolder" id="upload-text" >Drop HTML file here to upload your code.</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -185,10 +191,11 @@
         <div class="d-flex gap-3">
             <div class="d-flex flex-column align-items-center w-50">
                 <h3 class="m-0 pb-2" style="font-family: 'Roboto Slab', serif;">Email Preview</h3>
-                <div class="w-100 border rounded d-flex flex-column justify-content-center align-items-center">
-                    <div id="wrapper" class="align-self-center" style="width: 100%; height: 1000px;" >
-                        <iframe id="my-iframe" height="1000" class="w-100"></iframe>
+                <div class="position-relative w-100 border rounded d-flex flex-column justify-content-center align-items-center">
+                    <div id="wrapper" class="align-self-center pt-2" style="width: 100%; height: 1000px;" >
+                        <iframe id="my-iframe" height="1000" class="w-100 d-none"></iframe>
                     </div>
+                    <div id="dummy-wrapper" class="position-absolute top-0 w-100 h-100" ></div>
                 </div>
             </div>
             <div class="d-flex flex-column align-items-center w-50 " >

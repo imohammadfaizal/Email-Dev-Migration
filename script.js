@@ -210,6 +210,8 @@ let handleToggleScreen = function(evt){
 function dropOverDropzone(ev) {
     ev.preventDefault();
     $("#drop-zone").css( "zIndex", -1 );
+    $("#drop-animation").addClass("d-none");
+    $("#dummy-wrapper").addClass("d-none");
     if (ev.dataTransfer.items){
         [...ev.dataTransfer.items].forEach((item, i) => {
             if (item.kind === "file" && item.type === "text/html") {
@@ -228,11 +230,6 @@ function dropOverDropzone(ev) {
             }
         });
     } 
-    // else {
-    //   [...ev.dataTransfer.files].forEach((file, i) => {
-    //     console.log(`file[${i}].name = ${file.name}`);
-    //   });
-    // }
 }
 function dragOverDropzone(evt) {
     evt.preventDefault();
@@ -241,8 +238,28 @@ function dragOverDropzone(evt) {
 function dragOverTextarea(evt){
     evt.preventDefault();
     $("#drop-zone").css( "zIndex", 1000 );
+    $("#drop-animation").removeClass("d-none");
+    $("#dummy-wrapper").removeClass("d-none");
+}
+
+function dragLeaveDropzone(evt){
+    evt.preventDefault();
+    $("#drop-animation").addClass("d-none");
+    $("#drop-zone").css( "zIndex", -1 );
+    $("#dummy-wrapper").removeClass("d-none");
 }
 
 $("#original-file").keyup(()=>{
     $("#submit-btn").removeClass("disabled");
 })
+
+window.addEventListener("dragover",function(e){
+    e.preventDefault();
+    if (e.target.id !== "drop-zone") {
+        e.dataTransfer.effectAllowed = 'none';
+        e.dataTransfer.dropEffect = 'none';
+    }
+}, false);
+window.addEventListener("drop",function(e){
+    e.preventDefault();
+}, false);
