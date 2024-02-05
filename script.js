@@ -10,20 +10,20 @@ let m = iframes.length;
 let HREF;
 let newUrl;
 let fileToUpload;
-document.getElementById('upload-file').addEventListener( 'change', handleFileUpload, false );
-$("#original-file").keyup(()=>{ $("#submit-btn").removeClass("disabled"); })
+document.getElementById('upload-file').addEventListener('change', handleFileUpload, false);
+$("#original-file").keyup(() => { $("#submit-btn").removeClass("disabled"); })
 
-function iframeCodeUpdate(codeToUpdate){
+function iframeCodeUpdate(codeToUpdate) {
     wrapper.innerHTML = iframeHTML;
     document.getElementById("my-iframe").contentWindow.document.write(codeToUpdate);
-    line_counter('modified'); 
+    line_counter('modified');
     disableDownload();
     return codeToUpdate;
 }
 
 let handleSubmit = async function () {
     $("#submit-btn").addClass("disabled");
-    modifiedCode.value="";
+    modifiedCode.value = "";
     $(".image-picker").html('');
     $(".image-picker").imagepicker({
         hide_select: true
@@ -33,17 +33,17 @@ let handleSubmit = async function () {
     handleEventsInAnchor();
 }
 
-let handleEventsInAnchor = function() {
+let handleEventsInAnchor = function () {
     for (let j = 0; j < m; j++) {
         HREF = iframes[j].contentDocument.querySelectorAll("a");
     }
     for (let d = 0; d < HREF.length; d++) {
-        HREF[d].addEventListener("click", (evt)=>{
+        HREF[d].addEventListener("click", (evt) => {
             evt.preventDefault();
             $(".hidden-link-modal").click();
             $("#new-url").val("");
             $("#current-url").val(evt.currentTarget.href);
-            newUrl=HREF[d];
+            newUrl = HREF[d];
             ((evt.currentTarget).outerHTML) ? $("#alias").val(evt.currentTarget.getAttribute("alias")) : $("#alias").val("");
         })
     }
@@ -56,18 +56,18 @@ let handleExtraction = async function () {
         let IMGelems = iframes[j].contentDocument.getElementsByTagName("img");
         let IMGBgelems = iframes[j].contentDocument.getElementsByTagName("td");
         for (let d = 0; d < IMGelems.length; d++) {
-            IMGmatches.set(IMGelems[d].src,IMGelems[d].alt);
+            IMGmatches.set(IMGelems[d].src, IMGelems[d].alt);
         }
         for (let d = 0; d < IMGBgelems.length; d++) {
-            if (IMGBgelems[d].getAttribute("background")) IMGmatches.set(IMGBgelems[d].getAttribute("background"),"");
+            if (IMGBgelems[d].getAttribute("background")) IMGmatches.set(IMGBgelems[d].getAttribute("background"), "");
         }
     }
     $(".image-picker").html('');
     await populateImageGallery(IMGmatches);
-    handleImageUpdate();  
+    handleImageUpdate();
 }
 
-let populateImageGallery = function (IMGmatches){
+let populateImageGallery = function (IMGmatches) {
     for (let idx of [...IMGmatches]) {
         $(".image-picker").append('<option data-img-src="' + idx[0] + '" <option data-img-alt="' + idx[1] + '">' + idx[0] + '</option>')
     }
@@ -77,41 +77,41 @@ let populateImageGallery = function (IMGmatches){
     return IMGmatches;
 }
 
-let handleImageUpdate = function(){
-    $(".image_picker_image").click(function(){
+let handleImageUpdate = function () {
+    $(".image_picker_image").click(function () {
         $("#updated-image-url").val("");
         $("#updated-image-alt").val("");
-        $("#updated-image").attr("src","")
+        $("#updated-image").attr("src", "")
         $(".hidden-image-modal").click();
-        $("#original-image").attr("src",this.src);
+        $("#original-image").attr("src", this.src);
         $("#original-image-url").text(this.src)
         $("#original-image-alt").text(this.alt);
-    })        
+    })
 }
 
-$("#save-changes-image").click( async () => {
+$("#save-changes-image").click(async () => {
     for (let j = 0; j < m; j++) {
         let IMGelems = iframes[j].contentDocument.getElementsByTagName("img");
         let IMGBgelems = iframes[j].contentDocument.getElementsByTagName("td");
         for (let d = 0; d < IMGelems.length; d++) {
-            if(IMGelems[d].src == $("#original-image-url").val()){
-                if($("#updated-image-url").val() !== ""){IMGelems[d].src = $("#updated-image-url").val()};
-                if($("#updated-image-alt").val() !== ""){IMGelems[d].alt = $("#updated-image-alt").val()};
+            if (IMGelems[d].src == $("#original-image-url").val()) {
+                if ($("#updated-image-url").val() !== "") { IMGelems[d].src = $("#updated-image-url").val() };
+                if ($("#updated-image-alt").val() !== "") { IMGelems[d].alt = $("#updated-image-alt").val() };
                 modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
             }
         }
         for (let d = 0; d < IMGBgelems.length; d++) {
             let bgImage = IMGBgelems[d].getAttribute("background");
-            if(bgImage && bgImage == $("#original-image-url").val() && $("#updated-image-url").val() !== ""){
-                IMGBgelems[d].setAttribute("background",$("#updated-image-url").val());
-                let imageURL = 'url("'+$("#updated-image-url").val()+'")'
+            if (bgImage && bgImage == $("#original-image-url").val() && $("#updated-image-url").val() !== "") {
+                IMGBgelems[d].setAttribute("background", $("#updated-image-url").val());
+                let imageURL = 'url("' + $("#updated-image-url").val() + '")'
                 IMGBgelems[d].style.backgroundImage = imageURL;
                 modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML.replaceAll($("#original-image-url").val(), $("#updated-image-url").val());
             }
         }
     }
     await iframeCodeUpdate(modifiedCode.value)
-    handleEventsInAnchor();    
+    handleEventsInAnchor();
     handleExtraction();
 })
 
@@ -127,9 +127,9 @@ let handleHREFTrack = function () {
     disableDownload();
 }
 
-$("#save-changes-url").click(()=>{
-    if($("#new-url").val()) newUrl.href=$("#new-url").val();
-    if($("#alias").val()) newUrl.setAttribute("alias",$("#alias").val());
+$("#save-changes-url").click(() => {
+    if ($("#new-url").val()) newUrl.href = $("#new-url").val();
+    if ($("#alias").val()) newUrl.setAttribute("alias", $("#alias").val());
     modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
     line_counter('modified');
     disableDownload();
@@ -155,15 +155,15 @@ let handleAmpscript = async function () {
     handleEventsInAnchor();
 }
 
-$("#updated-image-url").keyup(()=>{
-    $("#updated-image").attr("src",$("#updated-image-url").val());
+$("#updated-image-url").keyup(() => {
+    $("#updated-image").attr("src", $("#updated-image-url").val());
 })
 
 function disableDownload() {
-    if(modifiedCode.value==""){
+    if (modifiedCode.value == "") {
         $('#download-btn').addClass("disabled");
     }
-    else{
+    else {
         $('#download-btn').removeClass("disabled");
     }
 }
@@ -180,32 +180,32 @@ $('#download-btn').click(function (e) {
 
 function dropOverDropzone(evt) {
     evt.preventDefault();
-    $("#drop-zone").css( "zIndex", -1 );
+    $("#drop-zone").css("zIndex", -1);
     $("#drop-animation").addClass("d-none");
     $("#dummy-wrapper").addClass("d-none");
-    if (evt.dataTransfer.items){
+    if (evt.dataTransfer.items) {
         [...evt.dataTransfer.items].forEach((item, i) => {
             if (item.kind === "file" && item.type === "text/html") {
                 const file = item.getAsFile();
                 readFile(file);
             }
-            else{
-                handleToast('Please upload a valid HTML File','error');
+            else {
+                handleToast('Please upload a valid HTML File', 'error');
             }
         });
-    } 
+    }
 }
 
 
 function handleFileUpload(evt) {
     let file = evt.target.files[0];
-    if(file.type === "text/html"){
+    if (file.type === "text/html") {
         fileToUpload = file;
         $("#upload-btn").removeClass("disabled");
     }
-    else{
+    else {
         $("#upload-btn").addClass("disabled");
-        handleToast('Please select a valid HTML File','error');
+        handleToast('Please select a valid HTML File', 'error');
     }
 }
 
@@ -215,7 +215,7 @@ function handleFileUpdate() {
     $("#dummy-wrapper").addClass("d-none");
 }
 
-function readFile(file){
+function readFile(file) {
     let reader = new FileReader();
     let populateTextarea = (evt) => {
         $("#original-file").val(evt.target.result);
@@ -233,17 +233,17 @@ function dragOverDropzone(evt) {
     evt.preventDefault();
 }
 
-function dragOverTextarea(evt){
+function dragOverTextarea(evt) {
     evt.preventDefault();
-    $("#drop-zone").css( "zIndex", 1000 );
+    $("#drop-zone").css("zIndex", 1000);
     $("#drop-animation").removeClass("d-none");
     $("#dummy-wrapper").removeClass("d-none");
 }
 
-function dragLeaveDropzone(evt){
+function dragLeaveDropzone(evt) {
     evt.preventDefault();
     $("#drop-animation").addClass("d-none");
-    $("#drop-zone").css( "zIndex", -1 );
+    $("#drop-zone").css("zIndex", -1);
     $("#dummy-wrapper").removeClass("d-none");
 }
 
@@ -270,27 +270,27 @@ function line_counter(ele) {
     lineCountCache = lineCount;
 }
 
-function line_scroll(ele){
+function line_scroll(ele) {
     document.getElementById(`${ele}-line-counter`).scrollTop = document.getElementById(`${ele}-file`).scrollTop;
     document.getElementById(`${ele}-line-counter`).scrollLeft = document.getElementById(`${ele}-file`).scrollLeft;
 }
 
-let handleToggleScreen = function(evt){
-    if(evt.dataset.bool == "mobile"){ 
-        evt.innerHTML="Toggle to Desktop Screen";
-        evt.dataset.bool="desktop";
+let handleToggleScreen = function (evt) {
+    if (evt.dataset.bool == "mobile") {
+        evt.innerHTML = "Toggle to Desktop Screen";
+        evt.dataset.bool = "desktop";
         $("#wrapper").width("425px");
-        evt.setAttribute("title","Toggles iFrame to Desktop Screen");
+        evt.setAttribute("title", "Toggles iFrame to Desktop Screen");
     }
-    else{ 
-        evt.innerHTML="Toggle to Mobile Screen";
-        evt.dataset.bool="mobile";
+    else {
+        evt.innerHTML = "Toggle to Mobile Screen";
+        evt.dataset.bool = "mobile";
         $("#wrapper").width("100%");
-        evt.setAttribute("title","Toggles iFrame to Mobile Screen");
+        evt.setAttribute("title", "Toggles iFrame to Mobile Screen");
     }
 }
 
-window.addEventListener("dragover",function(e){
+window.addEventListener("dragover", function (e) {
     e.preventDefault();
     if (e.target.id !== "drop-zone") {
         e.dataTransfer.effectAllowed = 'none';
@@ -298,6 +298,6 @@ window.addEventListener("dragover",function(e){
     }
 }, false);
 
-window.addEventListener("drop",function(e){
+window.addEventListener("drop", function (e) {
     e.preventDefault();
 }, false);
