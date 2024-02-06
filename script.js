@@ -187,11 +187,7 @@ function dropOverDropzone(evt) {
         [...evt.dataTransfer.items].forEach((item, i) => {
             if (item.kind === "file" && item.type === "text/html") {
                 const file = item.getAsFile();
-                // readFile(file);
-                $(".hidden-upload-modal").click(()=>{
-                    haha(file);
-                });
-                $(".hidden-upload-modal").click()
+                readFile(file);
             }
             else {
                 handleToast('Please upload a valid HTML File', 'error');
