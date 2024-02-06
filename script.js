@@ -187,7 +187,11 @@ function dropOverDropzone(evt) {
         [...evt.dataTransfer.items].forEach((item, i) => {
             if (item.kind === "file" && item.type === "text/html") {
                 const file = item.getAsFile();
-                readFile(file);
+                // readFile(file);
+                $(".hidden-upload-modal").click(()=>{
+                    haha(file);
+                });
+                $(".hidden-upload-modal").click()
             }
             else {
                 handleToast('Please upload a valid HTML File', 'error');
@@ -195,7 +199,6 @@ function dropOverDropzone(evt) {
         });
     }
 }
-
 
 function handleFileUpload(evt) {
     let file = evt.target.files[0];
@@ -205,6 +208,7 @@ function handleFileUpload(evt) {
     }
     else {
         $("#upload-btn").addClass("disabled");
+        $("#upload-file").val("");
         handleToast('Please select a valid HTML File', 'error');
     }
 }
@@ -213,6 +217,7 @@ function handleFileUpdate() {
     $("#upload-btn").addClass("disabled");
     readFile(fileToUpload);
     $("#dummy-wrapper").addClass("d-none");
+    $("#upload-file").val("");
 }
 
 function readFile(file) {
