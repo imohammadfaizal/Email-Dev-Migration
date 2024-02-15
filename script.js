@@ -22,8 +22,9 @@ async function downloadImage() {
     }
 
     try {
-        // Fetch the image from GitHub raw URL
-        const response = await fetch(imageUrl);
+        // Fetch the image using cors-anywhere as a proxy
+        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+        const response = await fetch(proxyUrl + imageUrl);
         const blob = await response.blob(); // Convert the response to a Blob object
 
         // Create a download link
