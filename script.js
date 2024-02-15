@@ -13,35 +13,6 @@ let fileToUpload;
 document.getElementById('upload-file').addEventListener('change', handleFileUpload, false);
 $("#original-file").keyup(() => { $("#submit-btn").removeClass("disabled"); })
 
-
-async function downloadImage() {
-    var imageUrl = document.getElementById("imageUrl").value;
-    if (!imageUrl) {
-        alert("Please enter an image URL.");
-        return;
-    }
-
-    try {
-        // Fetch the image using cors-anywhere as a proxy
-        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-        const response = await fetch(proxyUrl + imageUrl);
-        const blob = await response.blob(); // Convert the response to a Blob object
-
-        // Create a download link
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.setAttribute('download', 'image.jpg'); // You can specify the filename here
-        document.body.appendChild(link);
-        link.click();
-
-        // Clean up
-        document.body.removeChild(link);
-    } catch (error) {
-        console.error('Error downloading image:', error);
-        alert('Error downloading image. Please try again.');
-    }
-}
-
 function iframeCodeUpdate(codeToUpdate) {
     wrapper.innerHTML = iframeHTML;
     document.getElementById("my-iframe").contentWindow.document.write(codeToUpdate);
