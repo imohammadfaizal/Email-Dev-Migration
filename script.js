@@ -76,6 +76,9 @@ let handleImageDownload = function (IMGDownload) {
 
     let zip = new JSZip();
     let count = 0;
+    let loaderBar = document.getElementById('loaderBar');  //Loader Support
+    let increment = 100 / IMGDownload.size;  //Loader Support
+    loaderBar.style.width = '0';  //Loader Support
 
     for (let idx of [...IMGDownload]) {
         let proxyURL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(idx[0]);
@@ -85,6 +88,9 @@ let handleImageDownload = function (IMGDownload) {
                 let filename = idx[0].substring(idx[0].lastIndexOf('/') + 1);
                 zip.file(filename, blob);
                 count++;
+
+                let progress = count * increment;  //Loader Support
+                loaderBar.style.width = progress + '%';  //Loader Support
 
                 if (count === IMGDownload.size) {
                     zip.generateAsync({ type: 'blob' })
@@ -97,6 +103,7 @@ let handleImageDownload = function (IMGDownload) {
                             dummyAnchor.click();
                             document.body.removeChild(dummyAnchor);
                             window.URL.revokeObjectURL(url);
+                            loaderBar.style.width = '0'; //Loader Support
                         });
                 }
             })

@@ -205,6 +205,21 @@
                 transform: translate(-50%, -50%);
             }
         }
+
+        .loader-container {
+            width: 100%;
+            height: 2px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .loader-bar {
+            width: 0;
+            height: 100%;
+            background-color: #4caf50; /* Green */
+            transition: width 0.3s ease-in-out;
+        }
+
     </style>
 </head>
 
@@ -247,8 +262,13 @@
                         title="Submit to Generate Preview">Submit and Preview</button>
                     <a id="download-btn" href="no-script.html" class="btn btn-dark disabled"
                         title="Downloads Modified HTML file" disabled>Download HTML</a>
-                    <button onclick="handleExtraction()" class="btn btn-dark"
+                    <div>
+                        <button onclick="handleExtraction()" class="btn btn-dark w-100"
                         title="Extract Images in Image Preview Tab">Extract & Download Images</button>
+                        <div class="loader-container">
+                            <div id="loaderBar" class="loader-bar"></div>
+                        </div>  
+                    </div>      
                     <button onclick="handleHREFTrack()" class="btn btn-dark"
                         title="Removes Tracking URL from HREF Attribute">Remove Tracking URL</button>
                     <button onclick="handleAmpscript()" class="btn btn-dark" title="Removes Unwanted Ampscript">Remove
