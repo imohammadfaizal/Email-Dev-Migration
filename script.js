@@ -58,6 +58,7 @@ let handleExtraction = async function () {
     }
     $(".image-picker").html('');
     await populateImageGallery(IMGmatches);
+    handleImageDownload(IMGmatches); //Added For Image Download
     handleImageUpdate();
 }
 
@@ -69,6 +70,38 @@ let populateImageGallery = function (IMGmatches) {
         hide_select: true
     });
     return IMGmatches;
+}
+
+let handleImageDownload = function (IMGDownload) {
+
+    let zip = new JSZip();
+    let count = 0;
+
+    for (let idx of [...IMGDownload]) {
+        let proxyURL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(idx[0]);
+        fetch(proxyURL)
+            .then(response => response.blob())
+            .then(blob => {
+                let filename = idx[0].substring(idx[0].lastIndexOf('/') + 1);
+                zip.file(filename, blob);
+                count++;
+
+                if (count === IMGDownload.size) {
+                    zip.generateAsync({ type: 'blob' })
+                        .then(function (content) {
+                            let url = window.URL.createObjectURL(content);
+                            let dummyAnchor = document.createElement('a');
+                            dummyAnchor.href = url;
+                            dummyAnchor.download = 'Images.zip';
+                            document.body.appendChild(dummyAnchor);
+                            dummyAnchor.click();
+                            document.body.removeChild(dummyAnchor);
+                            window.URL.revokeObjectURL(url);
+                        });
+                }
+            })
+            .catch(error => console.error('Error downloading image:', error));
+    };
 }
 
 let handleImageUpdate = function () {
