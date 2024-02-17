@@ -74,11 +74,8 @@ let populateImageGallery = function (IMGmatches) {
 
 let handleImageDownload = function (IMGDownload) {
 
-    let zip = new JSZip();
-    let count = 0;
-    let loaderBar = document.getElementById('loaderBar');  //Loader Support
-    let increment = 100 / IMGDownload.size;  //Loader Support
-    loaderBar.style.width = '0';  //Loader Support
+    let totalImages = IMGDownload.size;
+    let downloadedImages = 0;
 
     for (let idx of [...IMGDownload]) {
         let proxyURL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(idx[0]);
@@ -86,25 +83,23 @@ let handleImageDownload = function (IMGDownload) {
             .then(response => response.blob())
             .then(blob => {
                 let filename = idx[0].substring(idx[0].lastIndexOf('/') + 1);
-                zip.file(filename, blob);
-                count++;
+                let url = window.URL.createObjectURL(blob);
+                let dummyAnchor = document.createElement('a');
+                dummyAnchor.href = url;
+                dummyAnchor.download = filename;
+                document.body.appendChild(dummyAnchor);
+                dummyAnchor.click();
+                document.body.removeChild(dummyAnchor);
+                window.URL.revokeObjectURL(url);
 
-                let progress = count * increment;  //Loader Support
-                loaderBar.style.width = progress + '%';  //Loader Support
+                downloadedImages++;
+                let progressBar = document.getElementById('loaderBar');
+                progressBar.style.width = (downloadedImages / totalImages) * 100 + '%';
 
-                if (count === IMGDownload.size) {
-                    zip.generateAsync({ type: 'blob' })
-                        .then(function (content) {
-                            let url = window.URL.createObjectURL(content);
-                            let dummyAnchor = document.createElement('a');
-                            dummyAnchor.href = url;
-                            dummyAnchor.download = 'Images.zip';
-                            document.body.appendChild(dummyAnchor);
-                            dummyAnchor.click();
-                            document.body.removeChild(dummyAnchor);
-                            window.URL.revokeObjectURL(url);
-                            loaderBar.style.width = '0'; //Loader Support
-                        });
+                if (downloadedImages === totalImages) {
+                    setTimeout(() => {
+                        progressBar.style.width = '0%';
+                    }, 1000); // Reset after 1 second
                 }
             })
             .catch(error => console.error('Error downloading image:', error));
