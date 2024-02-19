@@ -58,7 +58,7 @@ let handleExtraction = async function () {
     }
     $(".image-picker").html('');
     await populateImageGallery(IMGmatches);
-    handleImageDownload(IMGmatches); //Added For Image Download
+    // handleImageDownload(IMGmatches); //Added For Image Download
     handleImageUpdate();
 }
 
