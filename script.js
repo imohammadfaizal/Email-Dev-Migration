@@ -3,7 +3,7 @@ let originalCode = document.getElementById('original-file');
 let lineCountCache = 0;
 const HTMLDocStandard = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">`;
-const iframeHTML = "<iframe id='my-iframe' height='1000'  class='w-100 ' ></iframe>"
+const iframeHTML = "<iframe id='my-iframe'  class='w-100 ' ></iframe>"
 let wrapper = document.getElementById('wrapper');
 let iframes = document.getElementsByTagName('iframe');
 let m = iframes.length;
@@ -11,7 +11,16 @@ let HREF;
 let newUrl;
 let fileToUpload;
 document.getElementById('upload-file').addEventListener('change', handleFileUpload, false);
-$("#original-file").keyup(() => { $("#submit-btn").removeClass("disabled"); })
+document.getElementById('upload-csv').addEventListener('change', handleCSVUpload, false);
+$("#original-file").keyup(() => { 
+    if($("#original-file").val()) {
+         $("#submit-btn").removeClass("disabled"); 
+         $("#dummy-wrapper").addClass("d-none"); 
+     } 
+     else{
+        $("#submit-btn").addClass("disabled") 
+    }
+})
 
 function iframeCodeUpdate(codeToUpdate) {
     wrapper.innerHTML = iframeHTML;
@@ -23,6 +32,15 @@ function iframeCodeUpdate(codeToUpdate) {
 
 let handleSubmit = async function () {
     purgeContainers();
+
+    $(".sidebar").toggleClass('show');
+    $(".code-editor").toggleClass('reduced');
+    $(".nav-tabs").toggleClass('show');
+    $(".header-button-container").toggleClass('d-none');
+    $(".logo-container").toggleClass('show');
+
+    $("#submit-container").addClass("d-none");
+
     await iframeCodeUpdate(originalCode.value);
     handleEventsInAnchor();
 }
@@ -43,6 +61,152 @@ let handleEventsInAnchor = function () {
     }
 }
 
+let handleAnchorHighlight = function (evt) {
+    $(".hidden-anchor-modal").click();
+    let anchorModalBody = document.getElementById("inner-anchor-modal-body");
+    anchorModalBody.innerHTML = '';
+
+    let fragment = document.createDocumentFragment();
+
+    HREF.forEach((href, index) => {   
+        let container = document.createElement('div');
+        container.className = 'iframe-input-container';
+
+        let iframe = document.createElement('iframe');
+        iframe.id = `iframe-anchor-${index + 1}`;
+        iframe.height = '50';
+        iframe.className = 'anchor-iframe';
+        iframe.scrolling = 'no';
+        iframe.srcdoc = `<div class="iframe-inner-container">${href.outerHTML}</div>`;
+        container.appendChild(iframe);
+
+        let inputContainer = document.createElement('div');
+        inputContainer.className = 'input-container';
+
+        let currentUrlField = document.createElement('input');
+        currentUrlField.type = 'text';
+        currentUrlField.value = href.href;
+        currentUrlField.readOnly = true;
+        currentUrlField.id = `current-anchor-${index + 1}`;
+        currentUrlField.className = 'current-url form-control';
+        inputContainer.appendChild(currentUrlField);
+
+        let inputField = document.createElement('input');
+        inputField.type = 'text';
+        inputField.id = `input-anchor-${index + 1}`;
+        inputField.placeholder = 'Enter new href';
+        inputField.className = 'new-url form-control';
+        inputContainer.appendChild(inputField);
+
+        let aliasField = document.createElement('input');
+        aliasField.type = 'text';
+        aliasField.id = `alias-anchor-${index + 1}`;
+        aliasField.placeholder = 'Enter alias';
+        aliasField.className = 'alias-url form-control';
+        aliasField.value = href.getAttribute("alias") || '';
+        inputContainer.appendChild(aliasField);
+
+        let copyButton = document.createElement('button');
+        copyButton.innerHTML = 'Copy';
+        copyButton.type = 'button';
+        copyButton.className = 'btn btn-secondary';
+        copyButton.onclick = () => { inputField.value = currentUrlField.value; };
+        inputContainer.insertBefore(copyButton, inputField);
+
+        let checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `checkbox-anchor-${index + 1}`;
+        checkbox.className = 'form-check-input';
+        checkbox.checked = true;
+        inputContainer.appendChild(checkbox);
+
+        container.appendChild(inputContainer);
+        fragment.appendChild(container);
+    });
+
+    anchorModalBody.appendChild(fragment);
+
+    document.getElementById("save-changes-anchor").onclick = function () {
+        HREF.forEach((href, index) => {
+            let checkbox = document.getElementById(`checkbox-anchor-${index + 1}`);
+            if (checkbox.checked) {
+                let newHref = document.getElementById(`input-anchor-${index + 1}`).value.trim();
+                let alias = document.getElementById(`alias-anchor-${index + 1}`).value.trim();
+                let mainIframe = document.getElementById('my-iframe');
+                let anchor = mainIframe.contentDocument.querySelectorAll('a')[index];
+
+                if (anchor && anchor.hasAttribute('href')) {
+                    anchor.href = newHref || href.href;
+                    if (alias) {
+                        anchor.setAttribute("alias", alias);
+                    } else {
+                        anchor.removeAttribute("alias");
+                    }
+                }
+            }
+        });
+        modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
+        line_counter('modified');
+        disableDownload();
+        $("#upload-csv").val("");
+    };
+};
+
+let anchorRefresh = function () {
+    HREF.forEach((href, index) => {
+        let currentUrlField = document.getElementById(`current-anchor-${index + 1}`);
+        currentUrlField.value = href.href;
+    })
+}
+
+function handleCSVUpload(event) {
+    const file = event.target.files[0];
+    if (file.type !== 'text/csv') {
+        alert('Please upload a CSV file.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const text = e.target.result;
+        const rows = text.split('\n').map(row => row.split(','));
+
+        const headers = rows.shift().map(header => header.trim().toLowerCase());
+        const newUrlIndex = headers.indexOf('new_url');
+        const aliasIndex = headers.indexOf('alias');
+
+        if (newUrlIndex === -1 || aliasIndex === -1) {
+            alert('CSV must contain "new-url" and "alias" columns.');
+            return;
+        }
+
+        let currentIndex = 0;
+
+        rows.forEach((columns) => {
+            const newUrl = columns[newUrlIndex]?.trim() || '';
+            const alias = columns[aliasIndex]?.trim() || '';
+
+            while (currentIndex < HREF.length) {
+                const currentUrlField = document.getElementById(`current-anchor-${currentIndex + 1}`);
+
+                if (currentUrlField && currentUrlField.value.trim() !== '') {
+                    const inputField = document.getElementById(`input-anchor-${currentIndex + 1}`);
+                    const aliasField = document.getElementById(`alias-anchor-${currentIndex + 1}`);
+
+                    if (inputField) inputField.value = newUrl;
+                    if (aliasField) aliasField.value = alias;
+
+                    currentIndex++;
+                    break;
+                }
+
+                currentIndex++;
+            }
+        });
+    };
+    reader.readAsText(file);
+}
+
 let handleExtraction = async function () {
     let IMGmatches = new Map();
     let j;
@@ -56,11 +220,121 @@ let handleExtraction = async function () {
             if (IMGBgelems[d].getAttribute("background")) IMGmatches.set(IMGBgelems[d].getAttribute("background"), "");
         }
     }
-    $(".image-picker").html('');
-    await populateImageGallery(IMGmatches);
-    // handleImageDownload(IMGmatches); //Added For Image Download
-    handleImageUpdate();
+    $(".hidden-image-modal").click();
+    let imageModalBody = document.getElementById("inner-image-modal-body");
+    imageModalBody.innerHTML = '';
+
+    let fragment = document.createDocumentFragment();
+
+    IMGmatches.forEach((alt, src) => {   
+        let container = document.createElement('div');
+        container.className = 'iframe-input-container';
+
+        let inputContainer = document.createElement('div');
+        inputContainer.className = 'input-container';
+
+        let imgContainer = document.createElement('div');
+        imgContainer.className = 'img-container';
+        imgContainer.style.background = '#bbbbbb';
+        imgContainer.style.padding = '10px';
+        imgContainer.style.marginBottom = '10px';
+
+        let imgElement = document.createElement('img');
+        imgElement.src = src;
+        imgElement.alt = alt;
+        imgElement.className = 'img-preview';
+        imgContainer.appendChild(imgElement);
+
+        inputContainer.appendChild(imgContainer);
+
+        let currentImgField = document.createElement('input');
+        currentImgField.type = 'text';
+        currentImgField.value = src;
+        currentImgField.readOnly = true;
+        currentImgField.id = `current-img-${src}`;
+        currentImgField.className = 'current-img form-control';
+        inputContainer.appendChild(currentImgField);
+
+        let inputImgField = document.createElement('input');
+        inputImgField.type = 'text';
+        inputImgField.id = `input-img-${src}`;
+        inputImgField.placeholder = 'Enter new src';
+        inputImgField.className = 'new-img form-control';
+        inputContainer.appendChild(inputImgField);
+
+        let altField = document.createElement('input');
+        altField.type = 'text';
+        altField.id = `alt-img-${src}`;
+        altField.placeholder = 'Enter alt text';
+        altField.className = 'alt-url form-control';
+        altField.value = alt;
+        inputContainer.appendChild(altField);
+
+        container.appendChild(inputContainer);
+        fragment.appendChild(container);
+    });
+    imageModalBody.appendChild(fragment);
+
+    document.getElementById("save-changes-img").onclick = function () {
+        IMGmatches.forEach((alt, src) => {
+            let newSrc = document.getElementById(`input-img-${src}`).value.trim();
+            let newAlt = document.getElementById(`alt-img-${src}`).value.trim();
+            let mainIframe = document.getElementById('my-iframe');
+            let img = mainIframe.contentDocument.querySelector(`img[src="${src}"]`);
+
+            if (img && img.hasAttribute('src')) {
+                img.src = newSrc || src;
+                if (newAlt) {
+                    img.setAttribute("alt", newAlt);
+                } else {
+                    img.removeAttribute("alt");
+                }
+            }
+        });
+        modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
+        line_counter('modified');
+        disableDownload();
+        $("#upload-csv").val("");
+    };
+    setTimeout(() => {
+        const imgContainers = document.querySelectorAll('.img-container');
+
+        imgContainers.forEach(container => {
+            const imgPreview = container.querySelector('.img-preview');
+
+            imgPreview.addEventListener('mouseover', () => {
+                container.style.overflow = 'visible';
+            });
+
+            imgPreview.addEventListener('mouseout', () => {
+                container.style.overflow = 'hidden';
+            });
+        });
+    }, 0);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // $(".image-picker").html('');
+    // await populateImageGallery(IMGmatches);
+    // handleImageDownload(IMGmatches); //Added For Image Download
+    // handleImageUpdate();
+// }
 
 let populateImageGallery = function (IMGmatches) {
     for (let idx of [...IMGmatches]) {
@@ -154,6 +428,7 @@ let handleHREFTrack = function () {
     modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
     line_counter('modified');
     disableDownload();
+    anchorRefresh();
 }
 
 $("#save-changes-url").click(() => {
@@ -227,6 +502,7 @@ function dropOverDropzone(evt) {
             else {
                 readFile(file);
             }
+            $("#upload-container").addClass("d-none");
         }
         else {
             handleToast('Please upload a valid HTML File', 'error');
@@ -249,6 +525,7 @@ function handleFileUpload(evt) {
         else {
             readFile(file);
         }
+        $("#upload-container").addClass("d-none");
         $("#dummy-wrapper").addClass("d-none");
     }
     else {
@@ -343,16 +620,10 @@ function line_scroll(ele) {
 
 let handleToggleScreen = function (evt) {
     if (evt.dataset.bool == "mobile") {
-        evt.innerHTML = "Toggle to Desktop Screen";
-        evt.dataset.bool = "desktop";
         $("#wrapper").width("425px");
-        evt.setAttribute("title", "Toggles iFrame to Desktop Screen");
     }
     else {
-        evt.innerHTML = "Toggle to Mobile Screen";
-        evt.dataset.bool = "mobile";
         $("#wrapper").width("100%");
-        evt.setAttribute("title", "Toggles iFrame to Mobile Screen");
     }
 }
 
@@ -367,3 +638,13 @@ window.addEventListener("dragover", function (e) {
 window.addEventListener("drop", function (e) {
     e.preventDefault();
 }, false);
+
+
+
+
+$(".nav-link").click((evt)=>{
+    $(".nav-link").removeClass("active");
+    $(evt.target).addClass("active");
+    $(".tab-menu").removeClass("d-none");
+    $('#'+$(evt.target).attr('tab')).addClass("d-none")
+})
