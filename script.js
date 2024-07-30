@@ -32,15 +32,12 @@ function iframeCodeUpdate(codeToUpdate) {
 
 let handleSubmit = async function () {
     purgeContainers();
-
     $(".sidebar").toggleClass('show');
     $(".code-editor").toggleClass('reduced');
     $(".nav-tabs").toggleClass('show');
     $(".header-button-container").toggleClass('d-none');
     $(".logo-container").toggleClass('show');
-
     $("#submit-container").addClass("d-none");
-
     await iframeCodeUpdate(originalCode.value);
     handleEventsInAnchor();
 }
@@ -86,6 +83,7 @@ let handleAnchorHighlight = function (evt) {
         let currentUrlField = document.createElement('input');
         currentUrlField.type = 'text';
         currentUrlField.value = href.href;
+        currentUrlField.title = href.href;
         currentUrlField.readOnly = true;
         currentUrlField.id = `current-anchor-${index + 1}`;
         currentUrlField.className = 'current-url form-control';
@@ -156,6 +154,7 @@ let anchorRefresh = function () {
     HREF.forEach((href, index) => {
         let currentUrlField = document.getElementById(`current-anchor-${index + 1}`);
         currentUrlField.value = href.href;
+        currentUrlField.title = href.href;
     })
 }
 
@@ -233,19 +232,24 @@ let handleExtraction = async function () {
         let inputContainer = document.createElement('div');
         inputContainer.className = 'input-container';
 
+        let imgContainerOuter = document.createElement('div');
+        imgContainerOuter.className = 'img-container-outer';
+        imgContainerOuter.style.background = '#bbbbbb';
+        imgContainerOuter.style.padding = '5px';
+        imgContainerOuter.style.marginBottom = '10px';
+
         let imgContainer = document.createElement('div');
         imgContainer.className = 'img-container';
         imgContainer.style.background = '#bbbbbb';
-        imgContainer.style.padding = '10px';
-        imgContainer.style.marginBottom = '10px';
 
         let imgElement = document.createElement('img');
         imgElement.src = src;
         imgElement.alt = alt;
         imgElement.className = 'img-preview';
+        
         imgContainer.appendChild(imgElement);
-
-        inputContainer.appendChild(imgContainer);
+        imgContainerOuter.appendChild(imgContainer);
+        inputContainer.appendChild(imgContainerOuter);
 
         let currentImgField = document.createElement('input');
         currentImgField.type = 'text';
@@ -294,57 +298,26 @@ let handleExtraction = async function () {
         modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
         line_counter('modified');
         disableDownload();
-        $("#upload-csv").val("");
     };
     setTimeout(() => {
-        const imgContainers = document.querySelectorAll('.img-container');
-
-        imgContainers.forEach(container => {
-            const imgPreview = container.querySelector('.img-preview');
-
-            imgPreview.addEventListener('mouseover', () => {
-                container.style.overflow = 'visible';
-            });
-
-            imgPreview.addEventListener('mouseout', () => {
-                container.style.overflow = 'hidden';
-            });
+        $('.img-container').each(function() {
+            $(this).hover(
+                function() {
+                    $(this).css("overflow", "visible");
+                },
+                function() {
+                    $(this).css("overflow", "hidden");
+                }
+            );
         });
     }, 0);
+    
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // $(".image-picker").html('');
     // await populateImageGallery(IMGmatches);
     // handleImageDownload(IMGmatches); //Added For Image Download
     // handleImageUpdate();
 // }
-
-let populateImageGallery = function (IMGmatches) {
-    for (let idx of [...IMGmatches]) {
-        $(".image-picker").append('<option data-img-src="' + idx[0] + '" <option data-img-alt="' + idx[1] + '">' + idx[0] + '</option>')
-    }
-    $(".image-picker").imagepicker({
-        hide_select: true
-    });
-    return IMGmatches;
-}
 
 let handleImageDownload = function (IMGDownload) {
 
@@ -379,44 +352,6 @@ let handleImageDownload = function (IMGDownload) {
             .catch(error => console.error('Error downloading image:', error));
     };
 }
-
-let handleImageUpdate = function () {
-    $(".image_picker_image").click(function () {
-        $("#updated-image-url").val("");
-        $("#updated-image-alt").val("");
-        $("#updated-image").attr("src", "")
-        $(".hidden-image-modal").click();
-        $("#original-image").attr("src", this.src);
-        $("#original-image-url").text(this.src)
-        $("#original-image-alt").text(this.alt);
-    })
-}
-
-$("#save-changes-image").click(async () => {
-    for (let j = 0; j < m; j++) {
-        let IMGelems = iframes[j].contentDocument.getElementsByTagName("img");
-        let IMGBgelems = iframes[j].contentDocument.getElementsByTagName("td");
-        for (let d = 0; d < IMGelems.length; d++) {
-            if (IMGelems[d].src == $("#original-image-url").val()) {
-                if ($("#updated-image-url").val() !== "") { IMGelems[d].src = $("#updated-image-url").val() };
-                if ($("#updated-image-alt").val() !== "") { IMGelems[d].alt = $("#updated-image-alt").val() };
-                modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
-            }
-        }
-        for (let d = 0; d < IMGBgelems.length; d++) {
-            let bgImage = IMGBgelems[d].getAttribute("background");
-            if (bgImage && bgImage == $("#original-image-url").val() && $("#updated-image-url").val() !== "") {
-                IMGBgelems[d].setAttribute("background", $("#updated-image-url").val());
-                let imageURL = 'url("' + $("#updated-image-url").val() + '")'
-                IMGBgelems[d].style.backgroundImage = imageURL;
-                modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML.replaceAll($("#original-image-url").val(), $("#updated-image-url").val());
-            }
-        }
-    }
-    await iframeCodeUpdate(modifiedCode.value)
-    handleEventsInAnchor();
-    handleExtraction();
-})
 
 let handleHREFTrack = function () {
     for (let d = 0; d < HREF.length; d++) {
@@ -453,12 +388,83 @@ let regexCall = function (strToMatch) {
     return strToMatch;
 }
 
-let handleAmpscript = async function () {
+$("#start-regex-phrase").val(`\\[\\#if`)
+$("#end-regex-phrase").val(`\\#if\\]`);
+$("#regex-submit").click(()=>{
+    let start = $("#start-regex-phrase").val();
+    let end = $("#end-regex-phrase").val();
     let iFrameCode = document.querySelector("iframe").contentDocument.documentElement.outerHTML;
-    let regex = iFrameCode.match(new RegExp(/\[\#if.*/gs))[0].match(new RegExp(/\[\#if(.*?)(\/\#if\])/gs))
-    modifiedCode.value = HTMLDocStandard + "\n" + iFrameCode.replaceAll(regex[0], "");
-    await iframeCodeUpdate(modifiedCode.value);
-    handleEventsInAnchor();
+    let regex = new RegExp(`${start}.*?${end}`, "gs");
+    let regexMatches = iFrameCode.match(regex);
+    // let regex = iFrameCode.match(new RegExp(/\[\#if.*/gs))[0].match(new RegExp(/\[\#if(.*?)(\/\#if\])/gs))
+    let PersonalisationModalBody = document.getElementById("inner-personalisation-modal-body");
+    PersonalisationModalBody.innerHTML = '';
+
+    let fragment = document.createDocumentFragment();
+
+    console.log(regexMatches);
+    if (regexMatches == null || regexMatches.length == 0 ) {
+        $('#inner-personalisation-modal-body').html('No Results Found')
+    }
+    else{
+        regexMatches.forEach((script, idx) => {
+            let container = document.createElement('div');
+            container.className = 'iframe-input-container';
+    
+            let inputContainer = document.createElement('div');
+            inputContainer.className = 'input-container d-flex flex-grow-1 m-0';
+    
+            let currentPersonalisation = document.createElement('textarea');
+            currentPersonalisation.type = 'text';
+            currentPersonalisation.value = script;
+            currentPersonalisation.readOnly = true;
+            currentPersonalisation.id = `current-personalisation-${idx}`;
+            currentPersonalisation.className = 'current-personalisation form-control';
+            currentPersonalisation.setAttribute('rows',7);
+            inputContainer.appendChild(currentPersonalisation);
+    
+            let inputPersonalisation = document.createElement('textarea');
+            inputPersonalisation.type = 'text';
+            inputPersonalisation.id = `input-personalisation-${idx}`;
+            inputPersonalisation.placeholder = 'Enter Replacement Script';
+            inputPersonalisation.className = 'new-personalisation form-control';
+            inputPersonalisation.setAttribute('rows',7);
+            inputContainer.appendChild(inputPersonalisation);
+    
+            let checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `checkbox-personalisation-${idx}`;
+            checkbox.className = 'form-check-input';
+            checkbox.checked = true;
+            inputContainer.appendChild(checkbox);
+    
+            container.appendChild(inputContainer);
+            fragment.appendChild(container);
+        });
+    }
+    PersonalisationModalBody.appendChild(fragment);
+
+    document.getElementById("save-changes-personalisation").onclick = function () {
+        let updatedCode = iFrameCode;
+        
+            regexMatches.forEach((script, index) => {
+                let checkbox = document.getElementById(`checkbox-personalisation-${index}`);
+                if (checkbox.checked) {
+                    let newScript = document.getElementById(`input-personalisation-${index}`).value.trim();
+                    updatedCode = updatedCode.replace(script, newScript);
+                }
+            });  
+    
+        modifiedCode.value = HTMLDocStandard + "\n" + updatedCode;
+        iframeCodeUpdate(modifiedCode.value);
+        handleEventsInAnchor();
+    };
+})
+
+let handleAmpscript = async function () {
+    $(".hidden-personalisation-modal").click();
+    let PersonalisationModalBody = document.getElementById("inner-personalisation-modal-body");
+    PersonalisationModalBody.innerHTML = '';
 }
 
 $("#updated-image-url").keyup(() => {
