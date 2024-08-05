@@ -3,8 +3,10 @@ let originalCode = document.getElementById('original-file');
 let lineCountCache = 0;
 const HTMLDocStandard = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">`;
-const iframeHTML = "<iframe id='my-iframe'  class='w-100 ' ></iframe>"
-let wrapper = document.getElementById('wrapper');
+const originalIframeHTML = "<iframe id='original-iframe'  class='w-100 ' ></iframe>"
+const modifiedIframeHTML = "<iframe id='modified-iframe'  class='w-100 ' ></iframe>"
+let originalWrapper = document.getElementById('original-wrapper');
+let modifiedWrapper = document.getElementById('modified-wrapper');
 let iframes = document.getElementsByTagName('iframe');
 let m = iframes.length;
 let HREF;
@@ -21,13 +23,33 @@ $("#original-file").keyup(() => {
         $("#submit-btn").addClass("disabled") 
     }
 })
+$(".regex-phrase").keyup(() => { 
+    if($("#start-regex-phrase").val() && $("#end-regex-phrase").val()) {
+         $("#regex-submit").removeClass("disabled"); 
+     } 
+     else{
+        $("#regex-submit").addClass("disabled") 
+    }
+})
 
-function iframeCodeUpdate(codeToUpdate) {
-    wrapper.innerHTML = iframeHTML;
-    document.getElementById("my-iframe").contentWindow.document.write(codeToUpdate);
+function originalIframeCodeUpdate(codeToUpdate) {
+    originalWrapper.innerHTML = originalIframeHTML;
+    document.getElementById("original-iframe").contentWindow.document.write(codeToUpdate);
     line_counter('modified');
     disableDownload();
     return codeToUpdate;
+}
+
+function modifiedIframeCodeUpdate(codeToUpdate) {
+    modifiedWrapper.innerHTML = modifiedIframeHTML;
+    document.getElementById("modified-iframe").contentWindow.document.write(codeToUpdate);
+    line_counter('modified');
+    disableDownload();
+    return codeToUpdate;
+}
+
+function modifiedCodeUpdate(){
+    modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("#modified-iframe").contentDocument.documentElement.outerHTML;
 }
 
 let handleSubmit = async function () {
@@ -35,16 +57,17 @@ let handleSubmit = async function () {
     $(".sidebar").toggleClass('show');
     $(".code-editor").toggleClass('reduced');
     $(".nav-tabs").toggleClass('show');
-    $(".header-button-container").toggleClass('d-none');
+    $(".header-button-container, .inner-header-button-container").toggleClass('d-none');
     $(".logo-container").toggleClass('show');
     $("#submit-container").addClass("d-none");
-    await iframeCodeUpdate(originalCode.value);
+    await originalIframeCodeUpdate(originalCode.value);
+    await modifiedIframeCodeUpdate(originalCode.value);
     handleEventsInAnchor();
 }
 
 let handleEventsInAnchor = function () {
     for (let j = 0; j < m; j++) {
-        HREF = iframes[j].contentDocument.querySelectorAll("a");
+        HREF = iframes[1].contentDocument.querySelectorAll("a");        
     }
     for (let d = 0; d < HREF.length; d++) {
         HREF[d].addEventListener("click", (evt) => {
@@ -130,7 +153,7 @@ let handleAnchorHighlight = function (evt) {
             if (checkbox.checked) {
                 let newHref = document.getElementById(`input-anchor-${index + 1}`).value.trim();
                 let alias = document.getElementById(`alias-anchor-${index + 1}`).value.trim();
-                let mainIframe = document.getElementById('my-iframe');
+                let mainIframe = document.getElementById('modified-iframe');
                 let anchor = mainIframe.contentDocument.querySelectorAll('a')[index];
 
                 if (anchor && anchor.hasAttribute('href')) {
@@ -143,7 +166,7 @@ let handleAnchorHighlight = function (evt) {
                 }
             }
         });
-        modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
+        modifiedCodeUpdate();
         line_counter('modified');
         disableDownload();
         $("#upload-csv").val("");
@@ -210,8 +233,8 @@ let handleExtraction = async function () {
     let IMGmatches = new Map();
     let j;
     for (j = 0; j < m; j++) {
-        let IMGelems = iframes[j].contentDocument.getElementsByTagName("img");
-        let IMGBgelems = iframes[j].contentDocument.getElementsByTagName("td");
+        let IMGelems = iframes[1].contentDocument.getElementsByTagName("img");
+        let IMGBgelems = iframes[1].contentDocument.getElementsByTagName("td");
         for (let d = 0; d < IMGelems.length; d++) {
             IMGmatches.set(IMGelems[d].src, IMGelems[d].alt);
         }
@@ -283,7 +306,7 @@ let handleExtraction = async function () {
         IMGmatches.forEach((alt, src) => {
             let newSrc = document.getElementById(`input-img-${src}`).value.trim();
             let newAlt = document.getElementById(`alt-img-${src}`).value.trim();
-            let mainIframe = document.getElementById('my-iframe');
+            let mainIframe = document.getElementById('modified-iframe');
             let img = mainIframe.contentDocument.querySelector(`img[src="${src}"]`);
 
             if (img && img.hasAttribute('src')) {
@@ -295,7 +318,7 @@ let handleExtraction = async function () {
                 }
             }
         });
-        modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
+        modifiedCodeUpdate();
         line_counter('modified');
         disableDownload();
     };
@@ -360,7 +383,7 @@ let handleHREFTrack = function () {
             HREF[d].href = regexCall(HREFTag);
         }
     }
-    modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
+    modifiedCodeUpdate();
     line_counter('modified');
     disableDownload();
     anchorRefresh();
@@ -369,7 +392,7 @@ let handleHREFTrack = function () {
 $("#save-changes-url").click(() => {
     if ($("#new-url").val()) newUrl.href = $("#new-url").val();
     if ($("#alias").val()) newUrl.setAttribute("alias", $("#alias").val());
-    modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("iframe").contentDocument.documentElement.outerHTML;
+    modifiedCodeUpdate();
     line_counter('modified');
     disableDownload();
 })
@@ -393,7 +416,7 @@ $("#end-regex-phrase").val(`\\#if\\]`);
 $("#regex-submit").click(()=>{
     let start = $("#start-regex-phrase").val();
     let end = $("#end-regex-phrase").val();
-    let iFrameCode = document.querySelector("iframe").contentDocument.documentElement.outerHTML;
+    let iFrameCode = document.querySelector("#modified-iframe").contentDocument.documentElement.outerHTML;
     let regex = new RegExp(`${start}.*?${end}`, "gs");
     let regexMatches = iFrameCode.match(regex);
     // let regex = iFrameCode.match(new RegExp(/\[\#if.*/gs))[0].match(new RegExp(/\[\#if(.*?)(\/\#if\])/gs))
@@ -430,13 +453,16 @@ $("#regex-submit").click(()=>{
             inputPersonalisation.className = 'new-personalisation form-control';
             inputPersonalisation.setAttribute('rows',7);
             inputContainer.appendChild(inputPersonalisation);
-    
+
+            let checkboxContainer = document.createElement('div');
+            checkboxContainer.className = 'd-flex justify-content-center w-150'
             let checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.id = `checkbox-personalisation-${idx}`;
             checkbox.className = 'form-check-input';
             checkbox.checked = true;
-            inputContainer.appendChild(checkbox);
+            checkboxContainer.appendChild(checkbox)
+            inputContainer.appendChild(checkboxContainer);
     
             container.appendChild(inputContainer);
             fragment.appendChild(container);
@@ -456,7 +482,7 @@ $("#regex-submit").click(()=>{
             });  
     
         modifiedCode.value = HTMLDocStandard + "\n" + updatedCode;
-        iframeCodeUpdate(modifiedCode.value);
+        modifiedIframeCodeUpdate(modifiedCode.value);
         handleEventsInAnchor();
     };
 })
@@ -465,6 +491,13 @@ let handleAmpscript = async function () {
     $(".hidden-personalisation-modal").click();
     let PersonalisationModalBody = document.getElementById("inner-personalisation-modal-body");
     PersonalisationModalBody.innerHTML = '';
+}
+
+let handleCodeCompare = function(){
+    $("#editor-container").toggleClass('some-style');
+    $("#original-code-container").toggleClass('some-style2');
+    $("#modified-code-container").toggleClass('some-style2 d-none');
+    $("#original-wrapper, .inner-original-btn").toggleClass('d-none');
 }
 
 $("#updated-image-url").keyup(() => {
@@ -626,10 +659,10 @@ function line_scroll(ele) {
 
 let handleToggleScreen = function (evt) {
     if (evt.dataset.bool == "mobile") {
-        $("#wrapper").width("425px");
+        $(".wrapper").width("425px");
     }
     else {
-        $("#wrapper").width("100%");
+        $(".wrapper").width("100%");
     }
 }
 
@@ -644,9 +677,6 @@ window.addEventListener("dragover", function (e) {
 window.addEventListener("drop", function (e) {
     e.preventDefault();
 }, false);
-
-
-
 
 $(".nav-link").click((evt)=>{
     $(".nav-link").removeClass("active");

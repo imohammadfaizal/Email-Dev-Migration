@@ -293,3 +293,16 @@ body, html{
     background-color: #7f4e71;
     border-color: #565e64;
 }
+.inner-header-button-container{
+    padding: 10px 0px 8px 0px;
+}
+.w-150{
+    width: 150px;
+}
+.some-style{
+    display: flex;
+    gap: 10px;
+}
+.some-style2{
+    flex: 0.5;
+}

@@ -97,8 +97,7 @@
                             </div>
                             <div class="d-flex flex-column">
                                 <div class="side-menu-label fw-bold">Images</div>
-                                <div class="side-menu-label pt-2 text-decoration-underline" style="cursor: pointer;" onclick="handleExtraction()" class="btn btn-dark"
-                                title="Preview Images">Preview Images</div>
+                                <div class="side-menu-label pt-2 text-decoration-underline" style="cursor: pointer;" onclick="handleExtraction()" title="Preview Images">Preview Images</div>
                                 <div class="side-menu-label">Download Images</div>
                             </div>
                         </div>
@@ -110,7 +109,7 @@
                             </div>
                             <div class="d-flex flex-column">
                                 <div class="side-menu-label fw-bold">Code Compare</div>
-                                <div class="side-menu-label pt-2">Existing vs New</div>
+                                <div class="side-menu-label pt-2 text-decoration-underline" style="cursor: pointer;" onclick="handleCodeCompare()" title="Toggle for Code Comaparison">Existing vs New</div>
                             </div>
                         </div>
                     </li>
@@ -129,6 +128,10 @@
                           <a class="fw-bold nav-link border border-end rounded-start-0" href="#" style="font-size: 17px;" onclick="handleToggleScreen(this)" data-bool="desktop" tab="editor-container" >Desktop</a>
                         </li>
                       </ul>
+                </div>
+                <div class="inner-header-button-container d-flex justify-content-around d-none border rounded-top">
+                    <div class="fw-bold fs-5 d-none inner-original-btn" >Original</div>
+                    <div class="fw-bold fs-5" >Modified</div>
                 </div>
                 <div id="editor-container" class="tab-menu editor w-100 position-relative" style="flex-grow: 1;">
                     <div class="h-100" id="original-code-container">
@@ -176,9 +179,12 @@
                         </div>
                     </div>
                 </div>
-                <div id="iframe-container" class="tab-menu d-none position-relative w-100 border rounded d-flex flex-column justify-content-center align-items-center" style="flex-grow: 1;">
-                    <div id="wrapper" class="align-self-center pt-2 d-flex" style="width: 100%; flex: 1 1 auto;">
-                        <iframe id="my-iframe" class="w-100 d-none"></iframe>
+                <div id="iframe-container" class="tab-menu d-none position-relative w-100 border border-top-0 rounded-bottom d-flex justify-content-around align-items-center px-3 pb-3 gap-3" style="flex-grow: 1;">
+                    <div id="original-wrapper" class="d-none wrapper align-self-center pt-2 d-flex h-100" style="width: 100%; ">
+                        <iframe id="original-iframe" class="w-100 d-none"></iframe>
+                    </div>
+                    <div id="modified-wrapper" class="wrapper align-self-center pt-2 d-flex h-100" style="width: 100%; ">
+                        <iframe id="modified-iframe" class="w-100 d-none"></iframe>
                     </div>
                     <div id="dummy-wrapper" class="position-absolute top-0 w-100 h-100"></div>
                 </div>
@@ -339,9 +345,9 @@
                     <div class="modal-body d-flex flex-column justify-content-between gap-1 pb-0">
                         <div class="d-flex gap-1 flex-column overflow-scroll" id="personalisation-modal-body" style="height: 700px;">
                             <div class="d-flex gap-4">
-                                <input type="text" class="form-control" id="start-regex-phrase" placeholder="Enter Starting Phrase">
-                                <input type="text" class="form-control" id="end-regex-phrase" placeholder="Enter Ending Phrase">
-                                <button class="btn btn-primary" id="regex-submit">Submit</button>
+                                <input type="text" class="form-control regex-phrase" id="start-regex-phrase" placeholder="Enter Starting Phrase">
+                                <input type="text" class="form-control regex-phrase" id="end-regex-phrase" placeholder="Enter Ending Phrase">
+                                <button class="btn btn-primary disabled" id="regex-submit">Submit</button>
                             </div>
                             <!-- <div class="d-flex justify-content-evenly" style="gap: 20px;">
                                 <span class="heading" style=" text-align: center; width: 210px; font-size: 20px; font-weight: bold;" >Preview</span>
@@ -349,7 +355,7 @@
                                 <span class="heading" style=" text-align: center; width: 410px; font-size: 20px; font-weight: bold;" >New SRC</span>
                                 <span class="heading" style=" text-align: center; width: 240px; font-size: 20px; font-weight: bold;" >Alt Text</span>
                             </div> -->
-                            <div id="inner-personalisation-modal-body" class="pe-2 overflow-scroll">
+                            <div id="inner-personalisation-modal-body" class="pe-2 overflow-scroll" style="padding-top: 30px;">
 
                             </div>
                         </div>
