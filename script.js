@@ -13,6 +13,7 @@ let HREF;
 let newUrl;
 let fileToUpload;
 document.getElementById('upload-file').addEventListener('change', handleFileUpload, false);
+document.getElementById('upload-new-file').addEventListener('change', handleFileUpload, false);
 document.getElementById('upload-csv').addEventListener('change', handleCSVUpload, false);
 $("#original-file").keyup(() => { 
     if($("#original-file").val()) {
@@ -59,10 +60,11 @@ let handleSubmit = async function () {
     $(".nav-tabs").toggleClass('show');
     $(".header-button-container, .inner-header-button-container").toggleClass('d-none');
     $(".logo-container").toggleClass('show');
-    $("#submit-container").addClass("d-none");
+    $("#submit-container").toggleClass("d-none");
     await originalIframeCodeUpdate(originalCode.value);
     await modifiedIframeCodeUpdate(originalCode.value);
     handleEventsInAnchor();
+    // handleToast('Submission successful','success');
 }
 
 let handleEventsInAnchor = function () {
@@ -579,8 +581,14 @@ function handleFileUpload(evt) {
 
 $("#save-changes-upload").click(() => {
     readFile(fileToUpload);
-    purgeContainers();
-    wrapper.innerHTML = "";
+    handleToast(`${fileToUpload.name} is uploaded successfully`,'success')
+    $(".sidebar").toggleClass('show');
+    $(".code-editor").toggleClass('reduced');
+    $(".nav-tabs").toggleClass('show');
+    $(".header-button-container, .inner-header-button-container").toggleClass('d-none');
+    $(".logo-container").toggleClass('show');
+    $("#submit-container").toggleClass("d-none");
+    handleCodeCompare();
 })
 
 async function readFile(file) {
@@ -635,13 +643,7 @@ function handleCloseUpload() {
 }
 
 let purgeContainers = function () {
-    $("#submit-btn").addClass("disabled");
     modifiedCode.value = "";
-    $(".image-picker").html('');
-    $(".image-picker").imagepicker({
-        hide_select: true
-    });
-    $("#upload-file").val("");
     disableDownload();
 }
 
