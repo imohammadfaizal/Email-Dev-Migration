@@ -24,6 +24,15 @@ body, html{
     cursor: pointer !important;
 }
 
+.jq-toast-wrap {
+    width: 280px;
+}
+
+.jq-has-icon {
+    padding-top: 13px;
+    padding-bottom: 13px;
+}
+
 .jq-toast-wrap.bottom-right {
     bottom: 10px !important;
     right: 10px !important;
@@ -292,6 +301,18 @@ body, html{
     color: #ffffff;
     background-color: #7f4e71;
     border-color: #565e64;
+}
+.save-changes-btn.disabled, .save-changes-btn:disabled {
+    color: #fff;
+    pointer-events: none;
+    background-color: #7f4e71;
+    border-color: #7f4e71;
+    opacity: var(--bs-btn-disabled-opacity);
+}
+:not(.btn-check)+.save-changes-btn:active {
+    color: #fff;
+    background-color: #4d5154;
+    border-color: #373b3e;
 }
 .inner-header-button-container{
     padding: 10px 0px 8px 0px;

@@ -76,7 +76,7 @@
                             <div class="d-flex flex-column">
                                 <div class="side-menu-label fw-bold">Remove Personalisation</div>
                                 <div class="side-menu-label pt-2">Header</div>
-                                <div class="side-menu-label text-decoration-underline" style="cursor: pointer;" onclick="handleAmpscript()">Salutation</div>
+                                <div class="side-menu-label text-decoration-underline pt-1" style="cursor: pointer;" onclick="handleAmpscript()">Salutation</div>
                             </div>
                         </div>
                     </li>
@@ -87,9 +87,11 @@
                             </div>
                             <div class="d-flex flex-column">
                                 <div class="side-menu-label fw-bold">Links</div>
-                                <div class="side-menu-label pt-2 text-decoration-underline" style="cursor: pointer;" onclick="handleAnchorHighlight()" class="btn btn-dark"
+                                <div class="side-menu-label pt-2 text-decoration-underline" style="cursor: pointer;" onclick="handleHREFTrack()" class="btn btn-dark"
+                                title="Highlights all the Anchor tag in the code">Remove Tracking URL</div>
+                                <div class="side-menu-label text-decoration-underline pt-1" style="cursor: pointer;" onclick="handleAnchorHighlight()" class="btn btn-dark"
                                 title="Highlights all the Anchor tag in the code">Manual Update</div>
-                                <div class="side-menu-label text-decoration-underline" style="cursor: pointer;" >Document Upload</div>
+                                <div class="side-menu-label text-decoration-underline pt-1" style="cursor: pointer;" >Document Upload</div>
                             </div>
                         </div>
                     </li>
@@ -101,7 +103,7 @@
                             <div class="d-flex flex-column">
                                 <div class="side-menu-label fw-bold">Images</div>
                                 <div class="side-menu-label pt-2 text-decoration-underline" style="cursor: pointer;" onclick="handleExtraction()" title="Preview Images">Preview Images</div>
-                                <div class="side-menu-label">Download Images</div>
+                                <div class="side-menu-label pt-1">Download Images</div>
                             </div>
                         </div>
                     </li>
@@ -275,7 +277,7 @@
                                 <input type="file" class="form-control" id="upload-csv" aria-describedby="upload-btn"
                                     aria-label="Upload" >
                             </div>
-                            <button onclick="handleHREFTrack()" class="btn btn-dark" title="Removes Tracking URL from HREF Attribute">Remove Tracking URL</button>
+                            <!-- <button onclick="handleHREFTrack()" class="btn btn-dark" title="Removes Tracking URL from HREF Attribute">Remove Tracking URL</button> -->
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="handleCloseUpload()"></button>
                         </div>
                     </div>

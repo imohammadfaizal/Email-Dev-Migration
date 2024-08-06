@@ -81,8 +81,38 @@ let handleEventsInAnchor = function () {
     }
 }
 
+let handleHREFTrack = function () {
+    for (let d = 0; d < HREF.length; d++) {
+        let HREFTag = HREF[d].href;
+        if (HREFTag && HREFTag !== regexCall(HREFTag)) {
+            HREF[d].href = regexCall(HREFTag);
+        }
+    }
+    handleToast('Tracking URL removed successfully', 'success');
+    modifiedCodeUpdate();
+    line_counter('modified');
+    disableDownload();
+    anchorRefresh();
+}
+
+let regexCall = function (strToMatch) {
+    // let regex =  strToMatch.match(new RegExp(/(?<=\[@trackurl%20.*\])(https?:\/\/(?:www\.)?[^\s]+)(?=\?utm)/)); 
+    // let regex2 = strToMatch.match(new RegExp(/(?<=\[@trackurl%20.*\])(https?:\/\/(?:www\.)?[^\s]+)(?=\[\/@trackurl\])/));
+    // const regex = strToMatch.match(new RegExp(/https?:\/\/[^\s\[\]?]+(?=\[\/@trackurl|\?utm|$)/g));
+    const regex = strToMatch.match(new RegExp(/https?:\/\/[^\s\[\]?]+(?=\[\/@trackurl|\?utm|\?site|$)/g));
+    if (regex) {
+        return regex[0];
+    }
+    // else if (regex2) {
+    //     return regex2[0];
+    // }
+    return strToMatch;
+}
+
 let handleAnchorHighlight = function (evt) {
+    $('#save-changes-anchor').addClass('disabled');
     $(".hidden-anchor-modal").click();
+    $('#upload-csv').val('');
     let anchorModalBody = document.getElementById("inner-anchor-modal-body");
     anchorModalBody.innerHTML = '';
 
@@ -117,6 +147,7 @@ let handleAnchorHighlight = function (evt) {
         inputField.id = `input-anchor-${index + 1}`;
         inputField.placeholder = 'Enter new href';
         inputField.className = 'new-url form-control';
+        inputField.addEventListener('keyup',()=>$('#save-changes-anchor').removeClass('disabled'))
         inputContainer.appendChild(inputField);
 
         let aliasField = document.createElement('input');
@@ -125,6 +156,7 @@ let handleAnchorHighlight = function (evt) {
         aliasField.placeholder = 'Enter alias';
         aliasField.className = 'alias-url form-control';
         aliasField.value = href.getAttribute("alias") || '';
+        aliasField.addEventListener('keyup',()=>$('#save-changes-anchor').removeClass('disabled'))
         inputContainer.appendChild(aliasField);
 
         let copyButton = document.createElement('button');
@@ -169,7 +201,7 @@ let handleAnchorHighlight = function (evt) {
         modifiedCodeUpdate();
         line_counter('modified');
         disableDownload();
-        $("#upload-csv").val("");
+        handleToast('Anchor Links have been updated successfully', 'success');
     };
 };
 
@@ -184,7 +216,8 @@ let anchorRefresh = function () {
 function handleCSVUpload(event) {
     const file = event.target.files[0];
     if (file.type !== 'text/csv') {
-        alert('Please upload a CSV file.');
+        handleToast('Please upload a valid CSV file','error');
+        $('#upload-csv').val('');
         return;
     }
 
@@ -198,7 +231,7 @@ function handleCSVUpload(event) {
         const aliasIndex = headers.indexOf('alias');
 
         if (newUrlIndex === -1 || aliasIndex === -1) {
-            alert('CSV must contain "new-url" and "alias" columns.');
+            handleToast('CSV must contain "new-url" and "alias" columns','error');
             return;
         }
 
@@ -227,7 +260,17 @@ function handleCSVUpload(event) {
         });
     };
     reader.readAsText(file);
+    $("#save-changes-anchor").removeClass('disabled')
+    handleToast('New URLs loaded succesfully', 'success');
 }
+
+$("#save-changes-url").click(() => {
+    if ($("#new-url").val()) newUrl.href = $("#new-url").val();
+    if ($("#alias").val()) newUrl.setAttribute("alias", $("#alias").val());
+    modifiedCodeUpdate();
+    line_counter('modified');
+    disableDownload();
+})
 
 let handleExtraction = async function () {
     let IMGmatches = new Map();
@@ -243,6 +286,7 @@ let handleExtraction = async function () {
         }
     }
     $(".hidden-image-modal").click();
+    $('#save-changes-img').addClass('disabled');
     let imageModalBody = document.getElementById("inner-image-modal-body");
     imageModalBody.innerHTML = '';
 
@@ -287,6 +331,7 @@ let handleExtraction = async function () {
         inputImgField.id = `input-img-${src}`;
         inputImgField.placeholder = 'Enter new src';
         inputImgField.className = 'new-img form-control';
+        inputImgField.addEventListener('keyup',()=>$('#save-changes-img').removeClass('disabled'));
         inputContainer.appendChild(inputImgField);
 
         let altField = document.createElement('input');
@@ -295,6 +340,7 @@ let handleExtraction = async function () {
         altField.placeholder = 'Enter alt text';
         altField.className = 'alt-url form-control';
         altField.value = alt;
+        altField.addEventListener('keyup',()=>$('#save-changes-img').removeClass('disabled'));
         inputContainer.appendChild(altField);
 
         container.appendChild(inputContainer);
@@ -318,6 +364,7 @@ let handleExtraction = async function () {
                 }
             }
         });
+        handleToast('Changes saved successfully','success');
         modifiedCodeUpdate();
         line_counter('modified');
         disableDownload();
@@ -334,13 +381,8 @@ let handleExtraction = async function () {
             );
         });
     }, 0);
-    
-}
-    // $(".image-picker").html('');
-    // await populateImageGallery(IMGmatches);
     // handleImageDownload(IMGmatches); //Added For Image Download
-    // handleImageUpdate();
-// }
+}
 
 let handleImageDownload = function (IMGDownload) {
 
@@ -374,41 +416,6 @@ let handleImageDownload = function (IMGDownload) {
             })
             .catch(error => console.error('Error downloading image:', error));
     };
-}
-
-let handleHREFTrack = function () {
-    for (let d = 0; d < HREF.length; d++) {
-        let HREFTag = HREF[d].href;
-        if (HREFTag && HREFTag !== regexCall(HREFTag)) {
-            HREF[d].href = regexCall(HREFTag);
-        }
-    }
-    modifiedCodeUpdate();
-    line_counter('modified');
-    disableDownload();
-    anchorRefresh();
-}
-
-$("#save-changes-url").click(() => {
-    if ($("#new-url").val()) newUrl.href = $("#new-url").val();
-    if ($("#alias").val()) newUrl.setAttribute("alias", $("#alias").val());
-    modifiedCodeUpdate();
-    line_counter('modified');
-    disableDownload();
-})
-
-let regexCall = function (strToMatch) {
-    // let regex =  strToMatch.match(new RegExp(/(?<=\[@trackurl%20.*\])(https?:\/\/(?:www\.)?[^\s]+)(?=\?utm)/)); 
-    // let regex2 = strToMatch.match(new RegExp(/(?<=\[@trackurl%20.*\])(https?:\/\/(?:www\.)?[^\s]+)(?=\[\/@trackurl\])/));
-    // const regex = strToMatch.match(new RegExp(/https?:\/\/[^\s\[\]?]+(?=\[\/@trackurl|\?utm|$)/g));
-    const regex = strToMatch.match(new RegExp(/https?:\/\/[^\s\[\]?]+(?=\[\/@trackurl|\?utm|\?site|$)/g));
-    if (regex) {
-        return regex[0];
-    }
-    // else if (regex2) {
-    //     return regex2[0];
-    // }
-    return strToMatch;
 }
 
 $("#start-regex-phrase").val(`\\[\\#if`)
@@ -482,6 +489,7 @@ $("#regex-submit").click(()=>{
             });  
     
         modifiedCode.value = HTMLDocStandard + "\n" + updatedCode;
+        handleToast('Changes saved successfully','success')
         modifiedIframeCodeUpdate(modifiedCode.value);
         handleEventsInAnchor();
     };
@@ -500,19 +508,6 @@ let handleCodeCompare = function(){
     $("#original-wrapper, .inner-original-btn").toggleClass('d-none');
 }
 
-$("#updated-image-url").keyup(() => {
-    $("#updated-image").attr("src", $("#updated-image-url").val());
-})
-
-function disableDownload() {
-    if (modifiedCode.value == "") {
-        $('#download-btn').addClass("disabled");
-    }
-    else {
-        $('#download-btn').removeClass("disabled");
-    }
-}
-
 $('#download-btn').click(function (e) {
     e.preventDefault();
     const link = document.createElement("a");
@@ -522,6 +517,15 @@ $('#download-btn').click(function (e) {
     link.click();
     URL.revokeObjectURL(link.href);
 });
+
+function disableDownload() {
+    if (modifiedCode.value == "") {
+        $('#download-btn').addClass("disabled");
+    }
+    else {
+        $('#download-btn').removeClass("disabled");
+    }
+}
 
 function dropOverDropzone(evt) {
     evt.preventDefault();
@@ -614,6 +618,18 @@ function dragLeaveDropzone(evt) {
     $("#dummy-wrapper").removeClass("d-none");
 }
 
+window.addEventListener("dragover", function (e) {
+    e.preventDefault();
+    if (e.target.id !== "drop-zone") {
+        e.dataTransfer.effectAllowed = 'none';
+        e.dataTransfer.dropEffect = 'none';
+    }
+}, false);
+
+window.addEventListener("drop", function (e) {
+    e.preventDefault();
+}, false);
+
 function handleCloseUpload() {
     $("#upload-file").val("");
 }
@@ -627,17 +643,6 @@ let purgeContainers = function () {
     });
     $("#upload-file").val("");
     disableDownload();
-}
-
-let handleToast = function (toastMessage, toastType) {
-    $.toast({
-        text: toastMessage,
-        position: 'bottom-right',
-        icon: toastType,
-        stack: 5,
-        loader: false,
-        hideAfter: 4000
-    })
 }
 
 function line_counter(ele) {
@@ -666,17 +671,16 @@ let handleToggleScreen = function (evt) {
     }
 }
 
-window.addEventListener("dragover", function (e) {
-    e.preventDefault();
-    if (e.target.id !== "drop-zone") {
-        e.dataTransfer.effectAllowed = 'none';
-        e.dataTransfer.dropEffect = 'none';
-    }
-}, false);
-
-window.addEventListener("drop", function (e) {
-    e.preventDefault();
-}, false);
+let handleToast = function (toastMessage, toastType) {
+    $.toast({
+        text: toastMessage,
+        position: 'bottom-right',
+        icon: toastType,
+        stack: 5,
+        loader: false,
+        hideAfter: 4000
+    })
+}
 
 $(".nav-link").click((evt)=>{
     $(".nav-link").removeClass("active");
