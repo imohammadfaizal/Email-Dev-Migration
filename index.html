@@ -39,19 +39,19 @@
         <div id="header-container" class="pb-3 border-bottom d-flex justify-content-between overflow-hidden">
             <div class="logo-container transition">
                 <div>
-                    <span class="material-symbols-outlined" style="font-size: 60px; line-height: 60px; color: #8A226F;">person_remove</span>
+                    <span class="material-symbols-outlined color-purple" style="font-size: 60px; line-height: 60px; ">person_remove</span>
                 </div>
-                <div style="font-size: 40px; line-height: 40px; color: #8A226F; font-weight: 500;">Email Code Migration</div>
+                <div style="font-size: 40px; line-height: 40px; font-weight: 500;" class="color-purple">Email Code Migration</div>
             </div>
             <div class="d-flex flex-column gap-3 header-button-container justify-content-end d-none">
                 <div class="d-flex justify-content-end">
-                    <button class="btn btn-dark position-relative"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2">upload</span>Create a new test <input class="position-absolute top-0 start-0 opacity-0" type="file" name="" id="upload-new-file"></button>
+                    <button class="btn btn-dark position-relative save-changes-btn"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2">upload</span>Create a new test <input class="cursor-pointer position-absolute top-0 start-0 opacity-0" type="file" name="" id="upload-new-file"></button>
                 </div>
                 <div class="d-flex gap-3">
-                    <a id="download-btn" href="no-script.html" class="btn btn-light border disabled" title="Downloads Modified HTML file" disabled><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2">Download</span>Download HTML</a>
-                    <button class="btn btn-light border"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2"><span class="material-symbols-outlined">mobile_friendly</span></span>Email Validation</button>
-                    <button class="btn btn-light border"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2"><span class="material-symbols-outlined">format_list_bulleted</span></span>Source Format</button>
-                    <button class="btn btn-light border"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2">description</span>Compress Size</button>
+                    <a id="download-btn" href="no-script.html" class="btn btn-light border border-purple disabled color-purple" title="Downloads Modified HTML file" disabled><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2 color-purple">Download</span>Download HTML</a>
+                    <button class="btn btn-light border border-purple color-purple"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2"><span class="material-symbols-outlined color-purple">mobile_friendly</span></span>Email Validation</button>
+                    <button class="btn btn-light border border-purple color-purple"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2"><span class="material-symbols-outlined color-purple">format_list_bulleted</span></span>Source Format</button>
+                    <button class="btn btn-light border border-purple color-purple"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2 color-purple">description</span>Compress Size</button>
                 </div>
             </div>
         </div>
@@ -71,38 +71,38 @@
                     <li class="side-menu py-3 ps-3 border-bottom">
                         <div class="d-flex gap-3">
                             <div class="d-flex">
-                                <span class="material-symbols-outlined" style="font-size: 60px; color: #8A226F;">delete</span>
+                                <span class="material-symbols-outlined color-purple" style="font-size: 60px; ">delete</span>
                             </div>
                             <div class="d-flex flex-column">
                                 <div class="side-menu-label fw-bold">Remove Personalisation</div>
                                 <div class="side-menu-label pt-2">Header</div>
-                                <div class="side-menu-label text-decoration-underline pt-1" style="cursor: pointer;" onclick="handleAmpscript()">Salutation</div>
+                                <div class="side-menu-label text-decoration-underline pt-1 cursor-pointer" onclick="handleAmpscript()">Salutation</div>
                             </div>
                         </div>
                     </li>
                     <li class="side-menu py-3 ps-3 border-bottom">
                         <div class="d-flex gap-3">
                             <div class="d-flex">
-                                <span class="material-symbols-outlined" style="font-size: 60px; color: #8A226F;">language</span>
+                                <span class="material-symbols-outlined color-purple" style="font-size: 60px; ">language</span>
                             </div>
                             <div class="d-flex flex-column">
                                 <div class="side-menu-label fw-bold">Links</div>
-                                <div class="side-menu-label pt-2 text-decoration-underline" style="cursor: pointer;" onclick="handleHREFTrack()" class="btn btn-dark"
+                                <div class="side-menu-label pt-2 text-decoration-underline cursor-pointer" onclick="handleHREFTrack()" class="btn btn-dark"
                                 title="Highlights all the Anchor tag in the code">Remove Tracking URL</div>
-                                <div class="side-menu-label text-decoration-underline pt-1" style="cursor: pointer;" onclick="handleAnchorHighlight()" class="btn btn-dark"
+                                <div class="side-menu-label text-decoration-underline pt-1 cursor-pointer" onclick="handleAnchorHighlight()" class="btn btn-dark"
                                 title="Highlights all the Anchor tag in the code">Manual Update</div>
-                                <div class="side-menu-label text-decoration-underline pt-1" style="cursor: pointer;" >Document Upload</div>
+                                <div class="side-menu-label text-decoration-underline pt-1 cursor-pointer" >Document Upload</div>
                             </div>
                         </div>
                     </li>
                     <li class="side-menu py-3 ps-3 border-bottom">
                         <div class="d-flex gap-3">
                             <div class="d-flex">
-                                <span class="material-symbols-outlined" style="font-size: 60px; color: #8A226F;">image</span>
+                                <span class="material-symbols-outlined color-purple" style="font-size: 60px; ">image</span>
                             </div>
                             <div class="d-flex flex-column">
                                 <div class="side-menu-label fw-bold">Images</div>
-                                <div class="side-menu-label pt-2 text-decoration-underline" style="cursor: pointer;" onclick="handleExtraction()" title="Preview Images">Preview Images</div>
+                                <div class="side-menu-label pt-2 text-decoration-underline cursor-pointer" onclick="handleExtraction()" title="Preview Images">Preview Images</div>
                                 <div class="side-menu-label pt-1">Download Images</div>
                             </div>
                         </div>
@@ -110,11 +110,11 @@
                     <li class="side-menu py-3 ps-3 border-bottom">
                         <div class="d-flex gap-3">
                             <div class="d-flex">
-                                <span class="material-symbols-outlined" style="font-size: 60px; color: #8A226F;">integration_instructions</span>
+                                <span class="material-symbols-outlined color-purple" style="font-size: 60px; ">integration_instructions</span>
                             </div>
                             <div class="d-flex flex-column">
                                 <div class="side-menu-label fw-bold">Code Compare</div>
-                                <div class="side-menu-label pt-2 text-decoration-underline" style="cursor: pointer;" onclick="handleCodeCompare()" title="Toggle for Code Comaparison">Existing vs New</div>
+                                <div class="side-menu-label pt-2 text-decoration-underline cursor-pointer" onclick="handleCodeCompare()" title="Toggle for Code Comaparison">Existing vs New</div>
                             </div>
                         </div>
                     </li>
@@ -124,19 +124,19 @@
                 <div id="nav-tabs-container" class="d-flex justify-content-center">
                     <ul class="nav nav-tabs">
                         <li class="nav-item ">
-                          <a class="fw-bold border-bottom nav-link border-top border rounded-end-0 active" aria-current="page" href="#" style="font-size: 17px;" tab="iframe-container" >Code</a>
+                          <a class="fw-bold border-bottom nav-link border-top border rounded-end-0 active code-btn cursor-pointer" aria-current="page" style="font-size: 17px;" tab="iframe-container" >Code</a>
                         </li>
                         <li class="nav-item">
-                          <a class="fw-bold nav-link border rounded-0" href="#" style="font-size: 17px;" tab="editor-container" onclick="handleToggleScreen(this)" data-bool="mobile" >Mobile</a>
+                          <a class="fw-bold nav-link border rounded-0 cursor-pointer" style="font-size: 17px;" tab="editor-container" onclick="handleToggleScreen(this)" data-bool="mobile" >Mobile</a>
                         </li>
                         <li class="nav-item">
-                          <a class="fw-bold nav-link border border-end rounded-start-0" href="#" style="font-size: 17px;" onclick="handleToggleScreen(this)" data-bool="desktop" tab="editor-container" >Desktop</a>
+                          <a class="fw-bold nav-link border border-end rounded-start-0 cursor-pointer" style="font-size: 17px;" onclick="handleToggleScreen(this)" data-bool="desktop" tab="editor-container" >Desktop</a>
                         </li>
                       </ul>
                 </div>
                 <div class="inner-header-button-container d-flex justify-content-around d-none border rounded-top">
-                    <div class="fw-bold fs-5 d-none inner-original-btn" >Original</div>
-                    <div class="fw-bold fs-5" >Modified</div>
+                    <div class="fw-bold fs-5 d-none inner-original-btn color-purple" >Original</div>
+                    <div class="fw-bold fs-5 color-purple" >Modified</div>
                 </div>
                 <div id="editor-container" class="tab-menu editor w-100 position-relative" style="flex-grow: 1;">
                     <div class="h-100" id="original-code-container">
@@ -195,7 +195,7 @@
                 </div>
             </div>
             <div class="d-flex justify-content-center pt-3" id="submit-container">
-                <button onclick="handleSubmit()" class="btn btn-dark disabled" id="submit-btn" title="Submit to Generate Preview">Submit and Preview</button>
+                <button onclick="handleSubmit()" class="btn save-changes-btn disabled" id="submit-btn" title="Submit to Generate Preview">Submit and Preview</button>
             </div>
     
         </div>
@@ -249,7 +249,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <!-- <h5 class="modal-title" id="exampleModalLabel">Warning</h5> -->
+                        <h5 class="modal-title" id="exampleModalLabel">Alert</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                             onclick="handleCloseUpload()"></button>
                     </div>
@@ -257,7 +257,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             onclick="handleCloseUpload()">Cancel</button>
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                        <button type="button" class="btn save-changes-btn" data-bs-dismiss="modal"
                             id="save-changes-upload">Upload HTML</button>
                     </div>
                 </div>
@@ -352,7 +352,7 @@
                             <div class="d-flex gap-4">
                                 <input type="text" class="form-control regex-phrase" id="start-regex-phrase" placeholder="Enter Starting Phrase">
                                 <input type="text" class="form-control regex-phrase" id="end-regex-phrase" placeholder="Enter Ending Phrase">
-                                <button class="btn btn-primary disabled" id="regex-submit">Submit</button>
+                                <button class="btn btn-primary" id="regex-submit">Submit</button>
                             </div>
                             <!-- <div class="d-flex justify-content-evenly" style="gap: 20px;">
                                 <span class="heading" style=" text-align: center; width: 210px; font-size: 20px; font-weight: bold;" >Preview</span>

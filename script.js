@@ -588,7 +588,15 @@ $("#save-changes-upload").click(() => {
     $(".header-button-container, .inner-header-button-container").toggleClass('d-none');
     $(".logo-container").toggleClass('show');
     $("#submit-container").toggleClass("d-none");
-    handleCodeCompare();
+    
+    $("#editor-container").removeClass('some-style');
+    $("#original-code-container, #modified-code-container").removeClass('some-style2');
+    $("#modified-code-container, #original-wrapper, .inner-original-btn").addClass('d-none');
+
+    $(".nav-link").removeClass("active");
+    $(".code-btn").addClass("active");
+    $(".tab-menu").removeClass("d-none");
+    $("#iframe-container").addClass("d-none");
 })
 
 async function readFile(file) {
