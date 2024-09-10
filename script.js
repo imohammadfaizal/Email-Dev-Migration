@@ -18,28 +18,28 @@ let fileToUpload;
 document.getElementById('upload-file').addEventListener('change', handleFileUpload, false);
 document.getElementById('upload-new-file').addEventListener('change', handleFileUpload, false);
 document.getElementById('upload-csv').addEventListener('change', handleCSVUpload, false);
-$("#original-file").keyup(() => {
-    if ($("#original-file").val()) {
-        $("#submit-btn").removeClass("disabled");
-        $("#dummy-wrapper").addClass("d-none");
+$('#original-file').keyup(() => {
+    if ($('#original-file').val()) {
+        $('#submit-btn').removeClass('disabled');
+        $('#dummy-wrapper').addClass('d-none');
     }
     else {
-        $("#submit-btn").addClass("disabled")
+        $('#submit-btn').addClass('disabled')
     }
 })
 
-$(".regex-phrase").keyup(() => {
-    if ($("#start-regex-phrase").val() && $("#end-regex-phrase").val()) {
-        $("#regex-submit").removeClass("disabled");
+$('.regex-phrase').keyup(() => {
+    if ($('#start-regex-phrase').val() && $('#end-regex-phrase').val()) {
+        $('#regex-submit').removeClass('disabled');
     }
     else {
-        $("#regex-submit").addClass("disabled")
+        $('#regex-submit').addClass('disabled')
     }
 })
 
 function originalIframeCodeUpdate(codeToUpdate) {
     originalWrapper.innerHTML = originalIframeHTML;
-    document.getElementById("original-iframe").contentWindow.document.write(codeToUpdate);
+    document.getElementById('original-iframe').contentWindow.document.write(codeToUpdate);
     line_counter('modified');
     disableDownload();
     return codeToUpdate;
@@ -47,33 +47,33 @@ function originalIframeCodeUpdate(codeToUpdate) {
 
 function modifiedIframeCodeUpdate(codeToUpdate) {
     modifiedWrapper.innerHTML = modifiedIframeHTML;
-    document.getElementById("modified-iframe").contentWindow.document.write(codeToUpdate);
+    document.getElementById('modified-iframe').contentWindow.document.write(codeToUpdate);
     line_counter('modified');
     disableDownload();
     return codeToUpdate;
 }
 
 function modifiedCodeUpdate() {
-    modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("#modified-iframe").contentDocument.documentElement.outerHTML;
+    modifiedCode.value = HTMLDocStandard + '\n' + document.querySelector('#modified-iframe').contentDocument.documentElement.outerHTML;
     line_counter('modified');
     disableDownload();
 }
 
 let handleSubmit = async function () {
     purgeContainers();
-    $(".sidebar").toggleClass('show');
-    $(".code-editor").toggleClass('reduced');
-    $(".nav-tabs").toggleClass('show');
-    $(".header-button-container, .inner-header-button-container").toggleClass('d-none');
-    $(".logo-container").toggleClass('show');
-    $("#submit-container").toggleClass("d-none");
-    $("#original-file").attr('readonly');
-    $("#download-btn-container").toggleClass('d-none');
-    $("#modified-code-container").toggleClass('d-none');
-    $("#original-code-container").toggleClass('d-none');
+    $('.sidebar').toggleClass('show');
+    $('.code-editor').toggleClass('reduced');
+    $('.nav-tabs').toggleClass('show');
+    $('.header-button-container, .inner-header-button-container').toggleClass('d-none');
+    $('.logo-container').toggleClass('show');
+    $('#submit-container').toggleClass('d-none');
+    $('#original-file').attr('readonly');
+    $('#download-btn-container').toggleClass('d-none');
+    $('#modified-code-container').toggleClass('d-none');
+    $('#original-code-container').toggleClass('d-none');
     await originalIframeCodeUpdate(originalCode.value);
     await modifiedIframeCodeUpdate(originalCode.value);
-    $("#modified-file").val($("#original-file").val());
+    $('#modified-file').val($('#original-file').val());
     line_counter('modified');
     handleEventsInAnchor();
     handleImageStorage();
@@ -82,27 +82,27 @@ let handleSubmit = async function () {
 
 let handleEventsInAnchor = function () {
     for (let j = 0; j < iFrameLength; j++) {
-        originalHREF = iframes[0].contentDocument.querySelectorAll("a");
+        originalHREF = iframes[0].contentDocument.querySelectorAll('a');
     }
     for (let j = 1; j < iFrameLength; j++) {
-        const anchors = iframes[1].contentDocument.querySelectorAll("a");
+        const anchors = iframes[1].contentDocument.querySelectorAll('a');
         anchors.forEach(anchor => {
             updatedHREF.push({ anchor: anchor, flag: 0 });
-            anchor.addEventListener("click", (evt) => {
+            anchor.addEventListener('click', (evt) => {
                 evt.preventDefault();
-                $(".hidden-link-modal").click();
-                $("#new-url").val("");
-                $("#current-url").val(evt.currentTarget.href);
+                $('.hidden-link-modal').click();
+                $('#new-url').val('');
+                $('#current-url').val(evt.currentTarget.href);
                 newUrl = anchor;
-                ((evt.currentTarget).outerHTML) ? $("#alias").val(evt.currentTarget.getAttribute("alias")) : $("#alias").val("");
+                ((evt.currentTarget).outerHTML) ? $('#alias').val(evt.currentTarget.getAttribute('alias')) : $('#alias').val('');
             })
         });
     }
 }
 
-$("#save-changes-url").click(() => {
-    if ($("#new-url").val()) newUrl.href = $("#new-url").val();
-    if ($("#alias").val()) newUrl.setAttribute("alias", $("#alias").val());
+$('#save-changes-url').click(() => {
+    if ($('#new-url').val()) newUrl.href = $('#new-url').val();
+    if ($('#alias').val()) newUrl.setAttribute('alias', $('#alias').val());
     modifiedCodeUpdate();
 })
 
@@ -136,9 +136,9 @@ let regexCall = function (strToMatch) {
 
 let handleAnchorHighlight = function (evt) {
     $('#save-changes-anchor').addClass('disabled');
-    $(".hidden-anchor-modal").click();
+    $('.hidden-anchor-modal').click();
     $('#upload-csv').val('');
-    let anchorModalBody = document.getElementById("inner-anchor-modal-body");
+    let anchorModalBody = document.getElementById('inner-anchor-modal-body');
     anchorModalBody.innerHTML = '';
 
     let fragment = document.createDocumentFragment();
@@ -152,7 +152,7 @@ let handleAnchorHighlight = function (evt) {
         iframe.height = '50';
         iframe.className = 'anchor-iframe';
         iframe.scrolling = 'no';
-        iframe.srcdoc = `<div class="iframe-inner-container">${href.anchor.outerHTML}</div>`;
+        iframe.srcdoc = `<div class='iframe-inner-container'>${href.anchor.outerHTML}</div>`;
         container.appendChild(iframe);
 
         let inputContainer = document.createElement('div');
@@ -169,8 +169,8 @@ let handleAnchorHighlight = function (evt) {
 
         let inputField = document.createElement('input');
         inputField.type = 'text';
-        inputField.value = href.flag === 1 ? href.anchor.href : "";
-        inputField.title = href.flag === 1 ? href.anchor.href : "";
+        inputField.value = href.flag === 1 ? href.anchor.href : '';
+        inputField.title = href.flag === 1 ? href.anchor.href : '';
         inputField.id = `input-anchor-${index + 1}`;
         inputField.placeholder = 'Enter new href';
         inputField.className = 'new-url form-control';
@@ -182,7 +182,7 @@ let handleAnchorHighlight = function (evt) {
         aliasField.id = `alias-anchor-${index + 1}`;
         aliasField.placeholder = 'Enter alias';
         aliasField.className = 'alias-url form-control';
-        aliasField.value = href.anchor.getAttribute("alias") || '';
+        aliasField.value = href.anchor.getAttribute('alias') || '';
         aliasField.addEventListener('keyup', () => $('#save-changes-anchor').removeClass('disabled'))
         inputContainer.appendChild(aliasField);
 
@@ -206,7 +206,7 @@ let handleAnchorHighlight = function (evt) {
 
     anchorModalBody.appendChild(fragment);
 
-    document.getElementById("save-changes-anchor").onclick = function () {
+    document.getElementById('save-changes-anchor').onclick = function () {
         updatedHREF.forEach((anchorTag, index) => {
             let checkbox = document.getElementById(`checkbox-anchor-${index + 1}`);
             if (checkbox.checked) {
@@ -219,9 +219,9 @@ let handleAnchorHighlight = function (evt) {
                     anchor.href = newHref || anchorTag.anchor.href;
                     newHref ? anchorTag.flag = 1 : anchorTag.flag = 0;
                     if (alias) {
-                        anchor.setAttribute("alias", alias);
+                        anchor.setAttribute('alias', alias);
                     } else {
-                        anchor.removeAttribute("alias");
+                        anchor.removeAttribute('alias');
                     }
                 }
             }
@@ -286,35 +286,35 @@ function handleCSVUpload(event) {
         });
     };
     reader.readAsText(file);
-    $("#save-changes-anchor").removeClass('disabled')
+    $('#save-changes-anchor').removeClass('disabled')
     handleToast('New URLs loaded succesfully', 'success');
 }
 
 let handleImageStorage = function () {
     for (let j = 0; j < iFrameLength; j++) {
-        let imgs = iframes[0].contentDocument.querySelectorAll("img");
-        let IMGBgelems = iframes[0].contentDocument.getElementsByTagName("td");
+        let imgs = iframes[0].contentDocument.querySelectorAll('img');
+        let IMGBgelems = iframes[0].contentDocument.getElementsByTagName('td');
         originalIMG.push(...imgs);
         for (let d = 0; d < IMGBgelems.length; d++) {
-            if (IMGBgelems[d].getAttribute("background")) originalIMG.push(IMGBgelems[d].getAttribute("background"));
+            if (IMGBgelems[d].getAttribute('background')) originalIMG.push(IMGBgelems[d].getAttribute('background'));
         }
     }
     for (let j = 1; j < iFrameLength; j++) {
-        const images = iframes[1].contentDocument.querySelectorAll("img");
-        let IMGBgelems = iframes[1].contentDocument.getElementsByTagName("td");
+        const images = iframes[1].contentDocument.querySelectorAll('img');
+        let IMGBgelems = iframes[1].contentDocument.getElementsByTagName('td');
         images.forEach(image => {
             updatedIMG.push({ image: image, flag: 0 });
         });
         for (let d = 0; d < IMGBgelems.length; d++) {
-            if (IMGBgelems[d].getAttribute("background")) updatedIMG.push({ image: IMGBgelems[d].getAttribute("background"), flag: 0, background: true });
+            if (IMGBgelems[d].getAttribute('background')) updatedIMG.push({ image: IMGBgelems[d].getAttribute('background'), flag: 0, background: true });
         }
     }    
 }
 
 let handleImageExtraction = async function () {
-    $(".hidden-image-modal").click();
+    $('.hidden-image-modal').click();
     $('#save-changes-img').addClass('disabled');
-    let imageModalBody = document.getElementById("inner-image-modal-body");
+    let imageModalBody = document.getElementById('inner-image-modal-body');
     imageModalBody.innerHTML = '';
 
     let fragment = document.createDocumentFragment();
@@ -366,7 +366,7 @@ let handleImageExtraction = async function () {
         imgContainerModified.style.background = '#bbbbbb';
 
         let imgElementModified = document.createElement('img');
-        imgElementModified.src = img.flag === 1 ? img.image.src : "";
+        imgElementModified.src = img.flag === 1 ? img.image.src : '';
         imgElementModified.alt = originalIMG[index].alt;
         imgElementModified.className = 'img-preview';
         imgElementModified.id = `img-preview-${index + 1}`;
@@ -378,8 +378,8 @@ let handleImageExtraction = async function () {
 
         let inputImgField = document.createElement('input');
         inputImgField.type = 'text';
-        inputImgField.value = img.flag === 1 ? img.image.src : "";
-        inputImgField.title = img.flag === 1 ? img.image.src : "";
+        inputImgField.value = img.flag === 1 ? img.image.src : '';
+        inputImgField.title = img.flag === 1 ? img.image.src : '';
         inputImgField.id = `input-img-${index + 1}`;
         inputImgField.placeholder = 'Enter new src';
         inputImgField.className = 'new-img form-control';
@@ -400,27 +400,27 @@ let handleImageExtraction = async function () {
     });
     imageModalBody.appendChild(fragment);
 
-    document.getElementById("save-changes-img").onclick = function () {
+    document.getElementById('save-changes-img').onclick = function () {
         updatedIMG.forEach((imageTag,idx) => {
             let newSrc = document.getElementById(`input-img-${idx + 1}`).value.trim();
             let newAlt = document.getElementById(`alt-img-${idx + 1}`).value.trim();
             let mainIframe = document.getElementById('modified-iframe');
-            let img = mainIframe.contentDocument.querySelector(`img[src="${originalIMG[idx].src}"]`);
+            let img = mainIframe.contentDocument.querySelector(`img[src='${originalIMG[idx].src}']`);
     
             if (img && img.hasAttribute('src')) {
                 img.src = newSrc || imageTag.image.src;
                 newSrc ? imageTag.flag = 1 : imageTag.flag = 0;
                 if (newAlt) {
-                    img.setAttribute("alt", newAlt);
+                    img.setAttribute('alt', newAlt);
                 } else {
-                    img.removeAttribute("alt");
+                    img.removeAttribute('alt');
                 }
             }
         });
         handleToast('Changes saved successfully', 'success');
         modifiedCodeUpdate();
     };
-    $(".new-img").keyup(function (){
+    $('.new-img').keyup(function (){
         let idx = $(this).attr('id').slice(-1);
         if($(this).val() === ''){
             $(`#img-container-${idx}`).addClass('invisible');
@@ -434,10 +434,10 @@ let handleImageExtraction = async function () {
         $('.img-container').each(function () {
             $(this).hover(
                 function () {
-                    $(this).css("overflow", "visible");
+                    $(this).css('overflow', 'visible');
                 },
                 function () {
-                    $(this).css("overflow", "hidden");
+                    $(this).css('overflow', 'hidden');
                 }
             );
         });
@@ -479,16 +479,16 @@ let handleImageDownload = function (IMGDownload) {
     };
 }
 
-$("#start-regex-phrase").val(`\\[\\#if`)
-$("#end-regex-phrase").val(`\\#if\\]`);
-$("#regex-submit").click(() => {
-    let start = $("#start-regex-phrase").val();
-    let end = $("#end-regex-phrase").val();
-    let iFrameCode = document.querySelector("#modified-iframe").contentDocument.documentElement.outerHTML;
-    let regex = new RegExp(`${start}.*?${end}`, "gs");
+$('#start-regex-phrase').val(`\\[\\#if`)
+$('#end-regex-phrase').val(`\\#if\\]`);
+$('#regex-submit').click(() => {
+    let start = $('#start-regex-phrase').val();
+    let end = $('#end-regex-phrase').val();
+    let iFrameCode = document.querySelector('#modified-iframe').contentDocument.documentElement.outerHTML;
+    let regex = new RegExp(`${start}.*?${end}`, 'gs');
     let regexMatches = iFrameCode.match(regex);
     // let regex = iFrameCode.match(new RegExp(/\[\#if.*/gs))[0].match(new RegExp(/\[\#if(.*?)(\/\#if\])/gs))
-    let PersonalisationModalBody = document.getElementById("inner-personalisation-modal-body");
+    let PersonalisationModalBody = document.getElementById('inner-personalisation-modal-body');
     PersonalisationModalBody.innerHTML = '';
 
     let fragment = document.createDocumentFragment();
@@ -538,7 +538,7 @@ $("#regex-submit").click(() => {
     }
     PersonalisationModalBody.appendChild(fragment);
 
-    document.getElementById("save-changes-personalisation").onclick = function () {
+    document.getElementById('save-changes-personalisation').onclick = function () {
         let updatedCode = iFrameCode;
 
         regexMatches.forEach((script, index) => {
@@ -549,7 +549,7 @@ $("#regex-submit").click(() => {
             }
         });
 
-        modifiedCode.value = HTMLDocStandard + "\n" + updatedCode;
+        modifiedCode.value = HTMLDocStandard + '\n' + updatedCode;
         handleToast('Changes saved successfully', 'success')
         modifiedIframeCodeUpdate(modifiedCode.value);
         handleEventsInAnchor();
@@ -557,24 +557,24 @@ $("#regex-submit").click(() => {
 })
 
 let handleAmpscript = async function () {
-    $(".hidden-personalisation-modal").click();
-    let PersonalisationModalBody = document.getElementById("inner-personalisation-modal-body");
+    $('.hidden-personalisation-modal').click();
+    let PersonalisationModalBody = document.getElementById('inner-personalisation-modal-body');
     PersonalisationModalBody.innerHTML = '';
 }
 
 let handleCodeCompare = function () {
-    $("#editor-container").toggleClass('some-style');
-    $("#modified-code-container").toggleClass('some-style2');
-    $("#original-code-container").toggleClass('some-style2 d-none');
-    $("#original-wrapper, .inner-original-btn").toggleClass('d-none');
+    $('#editor-container').toggleClass('some-style');
+    $('#modified-code-container').toggleClass('some-style2');
+    $('#original-code-container').toggleClass('some-style2 d-none');
+    $('#original-wrapper, .inner-original-btn').toggleClass('d-none');
 }
 
 $('.download-btn').click(function (e) {
     e.preventDefault();
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     const file = new Blob([modifiedCode.value], { type: 'text/plain' });
     link.href = URL.createObjectURL(file);
-    link.download = "index.html";
+    link.download = 'index.html';
     link.click();
     URL.revokeObjectURL(link.href);
 });
@@ -584,33 +584,33 @@ $('#copy-btn').click(function (e) {
 });
 
 function disableDownload() {
-    if (modifiedCode.value == "") {
-        $('.download-btn, #copy-btn, #code-compare').addClass("disabled");
+    if (modifiedCode.value == '') {
+        $('.download-btn, #copy-btn, #code-compare').addClass('disabled');
     }
     else {
-        $('.download-btn, #copy-btn, #code-compare').removeClass("disabled");
+        $('.download-btn, #copy-btn, #code-compare').removeClass('disabled');
     }
 }
 
 function dropOverDropzone(evt) {
     evt.preventDefault();
-    $("#drop-zone").css("zIndex", -1);
-    $("#drop-animation").addClass("d-none");
-    $("#dummy-wrapper").addClass("d-none");
+    $('#drop-zone').css('zIndex', -1);
+    $('#drop-animation').addClass('d-none');
+    $('#dummy-wrapper').addClass('d-none');
     if (evt.dataTransfer.items && evt.dataTransfer.items.length === 1) {
         let item = evt.dataTransfer.items[0]
-        if (item.kind === "file" && item.type === "text/html") {
+        if (item.kind === 'file' && item.type === 'text/html') {
             const file = item.getAsFile();
-            if (originalCode.value !== "") {
-                $(".hidden-upload-modal").click(() => {
+            if (originalCode.value !== '') {
+                $('.hidden-upload-modal').click(() => {
                     fileToUpload = file;
                 });
-                $(".hidden-upload-modal").click();
+                $('.hidden-upload-modal').click();
             }
             else {
                 readFile(file);
             }
-            $("#upload-container").addClass("d-none");
+            $('#upload-container').addClass('d-none');
         }
         else {
             handleToast('Please upload a valid HTML File', 'error');
@@ -623,45 +623,45 @@ function dropOverDropzone(evt) {
 
 function handleFileUpload(evt) {
     let file = evt.target.files[0];
-    if (file.type === "text/html") {
-        if (originalCode.value !== "") {
-            $(".hidden-upload-modal").click(() => {
+    if (file.type === 'text/html') {
+        if (originalCode.value !== '') {
+            $('.hidden-upload-modal').click(() => {
                 fileToUpload = file;
             });
-            $(".hidden-upload-modal").click();
+            $('.hidden-upload-modal').click();
         }
         else {
             readFile(file);
         }
-        $("#upload-container").addClass("d-none");
-        $("#dummy-wrapper").addClass("d-none");
+        $('#upload-container').addClass('d-none');
+        $('#dummy-wrapper').addClass('d-none');
     }
     else {
-        $("#upload-file").val("");
+        $('#upload-file').val('');
         handleToast('Please select a valid HTML File', 'error');
     }
 }
 
-$("#save-changes-upload").click(() => {
+$('#save-changes-upload').click(() => {
     readFile(fileToUpload);
     handleToast(`${fileToUpload.name} is uploaded successfully`, 'success')
-    $(".sidebar").toggleClass('show');
-    $(".code-editor").toggleClass('reduced');
-    $(".nav-tabs").toggleClass('show');
-    $(".header-button-container, .inner-header-button-container").toggleClass('d-none');
-    $(".logo-container").toggleClass('show');
-    $("#submit-container").toggleClass("d-none");
+    $('.sidebar').toggleClass('show');
+    $('.code-editor').toggleClass('reduced');
+    $('.nav-tabs').toggleClass('show');
+    $('.header-button-container, .inner-header-button-container').toggleClass('d-none');
+    $('.logo-container').toggleClass('show');
+    $('#submit-container').toggleClass('d-none');
 
-    $("#editor-container").removeClass('some-style');
-    $("#original-code-container, #modified-code-container").removeClass('some-style2');
-    $("#original-code-container").removeClass('d-none');
-    $("#modified-code-container, #original-wrapper, .inner-original-btn").addClass('d-none');
+    $('#editor-container').removeClass('some-style');
+    $('#original-code-container, #modified-code-container').removeClass('some-style2');
+    $('#original-code-container').removeClass('d-none');
+    $('#modified-code-container, #original-wrapper, .inner-original-btn').addClass('d-none');
 
-    $(".nav-link").removeClass("active");
-    $(".code-btn").addClass("active");
-    $(".tab-menu").removeClass("d-none");
-    $("#iframe-container").addClass("d-none");
-    $("#download-btn-container").toggleClass('d-none');
+    $('.nav-link').removeClass('active');
+    $('.code-btn').addClass('active');
+    $('.tab-menu').removeClass('d-none');
+    $('#iframe-container').addClass('d-none');
+    $('#download-btn-container').toggleClass('d-none');
 })
 
 async function readFile(file) {
@@ -669,9 +669,9 @@ async function readFile(file) {
         let reader = new FileReader();
         reader.onload = (event) => {
             const fileContents = event.target.result;
-            $("#original-file").val(fileContents);
-            line_counter("original");
-            $("#submit-btn").removeClass("disabled");
+            $('#original-file').val(fileContents);
+            line_counter('original');
+            $('#submit-btn').removeClass('disabled');
             resolve(file);
         };
         reader.onerror = (error) => {
@@ -687,36 +687,36 @@ function dragOverDropzone(evt) {
 
 function dragOverTextarea(evt) {
     evt.preventDefault();
-    $("#drop-zone").css("zIndex", 1000);
-    $("#drop-animation").removeClass("d-none");
-    $("#dummy-wrapper").removeClass("d-none");
+    $('#drop-zone').css('zIndex', 1000);
+    $('#drop-animation').removeClass('d-none');
+    $('#dummy-wrapper').removeClass('d-none');
 }
 
 function dragLeaveDropzone(evt) {
     evt.preventDefault();
-    $("#drop-animation").addClass("d-none");
-    $("#drop-zone").css("zIndex", -1);
-    $("#dummy-wrapper").removeClass("d-none");
+    $('#drop-animation').addClass('d-none');
+    $('#drop-zone').css('zIndex', -1);
+    $('#dummy-wrapper').removeClass('d-none');
 }
 
-window.addEventListener("dragover", function (e) {
+window.addEventListener('dragover', function (e) {
     e.preventDefault();
-    if (e.target.id !== "drop-zone") {
+    if (e.target.id !== 'drop-zone') {
         e.dataTransfer.effectAllowed = 'none';
         e.dataTransfer.dropEffect = 'none';
     }
 }, false);
 
-window.addEventListener("drop", function (e) {
+window.addEventListener('drop', function (e) {
     e.preventDefault();
 }, false);
 
 function handleCloseUpload() {
-    $("#upload-file").val("");
+    $('#upload-file').val('');
 }
 
 let purgeContainers = function () {
-    modifiedCode.value = "";
+    modifiedCode.value = '';
     disableDownload();
 }
 
@@ -738,11 +738,11 @@ function line_scroll(ele) {
 }
 
 let handleToggleScreen = function (evt) {
-    if (evt.dataset.bool == "mobile") {
-        $(".wrapper").width("425px");
+    if (evt.dataset.bool == 'mobile') {
+        $('.wrapper').width('425px');
     }
     else {
-        $(".wrapper").width("100%");
+        $('.wrapper').width('100%');
     }
 }
 
@@ -757,11 +757,11 @@ let handleToast = function (toastMessage, toastType) {
     })
 }
 
-$(".nav-link").click((evt) => {
-    $(".nav-link").removeClass("active");
-    $(evt.target).addClass("active");
-    $(".tab-menu").removeClass("d-none");
-    $('#' + $(evt.target).attr('tab')).addClass("d-none")
+$('.nav-link').click((evt) => {
+    $('.nav-link').removeClass('active');
+    $(evt.target).addClass('active');
+    $('.tab-menu').removeClass('d-none');
+    $('#' + $(evt.target).attr('tab')).addClass('d-none')
 })
 
 function isSelfClosingTag(tagName) {
