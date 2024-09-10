@@ -8,31 +8,30 @@ const modifiedIframeHTML = "<iframe id='modified-iframe'  class='w-100 ' ></ifra
 let originalWrapper = document.getElementById('original-wrapper');
 let modifiedWrapper = document.getElementById('modified-wrapper');
 let iframes = document.getElementsByTagName('iframe');
-let m = iframes.length;
+let iFrameLength = iframes.length;
 let originalHREF;
 let updatedHREF = [];
-let anchorFlag = 0;
 let newUrl;
 let fileToUpload;
 document.getElementById('upload-file').addEventListener('change', handleFileUpload, false);
 document.getElementById('upload-new-file').addEventListener('change', handleFileUpload, false);
 document.getElementById('upload-csv').addEventListener('change', handleCSVUpload, false);
-$("#original-file").keyup(() => { 
-    if($("#original-file").val()) {
-         $("#submit-btn").removeClass("disabled"); 
-         $("#dummy-wrapper").addClass("d-none"); 
-     } 
-     else{
-        $("#submit-btn").addClass("disabled") 
+$("#original-file").keyup(() => {
+    if ($("#original-file").val()) {
+        $("#submit-btn").removeClass("disabled");
+        $("#dummy-wrapper").addClass("d-none");
+    }
+    else {
+        $("#submit-btn").addClass("disabled")
     }
 })
 
-$(".regex-phrase").keyup(() => { 
-    if($("#start-regex-phrase").val() && $("#end-regex-phrase").val()) {
-         $("#regex-submit").removeClass("disabled"); 
-     } 
-     else{
-        $("#regex-submit").addClass("disabled") 
+$(".regex-phrase").keyup(() => {
+    if ($("#start-regex-phrase").val() && $("#end-regex-phrase").val()) {
+        $("#regex-submit").removeClass("disabled");
+    }
+    else {
+        $("#regex-submit").addClass("disabled")
     }
 })
 
@@ -52,7 +51,7 @@ function modifiedIframeCodeUpdate(codeToUpdate) {
     return codeToUpdate;
 }
 
-function modifiedCodeUpdate(){
+function modifiedCodeUpdate() {
     modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("#modified-iframe").contentDocument.documentElement.outerHTML;
     line_counter('modified');
     disableDownload();
@@ -79,27 +78,30 @@ let handleSubmit = async function () {
 }
 
 let handleEventsInAnchor = function () {
-    for (let j = 0; j < m; j++) {
-        originalHREF = iframes[0].contentDocument.querySelectorAll("a");       
+    for (let j = 0; j < iFrameLength; j++) {
+        originalHREF = iframes[0].contentDocument.querySelectorAll("a");
     }
-    for (let j = 1; j < m; j++) {
+    for (let j = 1; j < iFrameLength; j++) {
         const anchors = iframes[1].contentDocument.querySelectorAll("a");
         anchors.forEach(anchor => {
             updatedHREF.push({ anchor: anchor, flag: 0 });
+            anchor.addEventListener("click", (evt) => {
+                evt.preventDefault();
+                $(".hidden-link-modal").click();
+                $("#new-url").val("");
+                $("#current-url").val(evt.currentTarget.href);
+                newUrl = anchor;
+                ((evt.currentTarget).outerHTML) ? $("#alias").val(evt.currentTarget.getAttribute("alias")) : $("#alias").val("");
+            })
         });
     }
-    
-    for (let d = 0; d < updatedHREF.length; d++) {
-        // updatedHREF[d].addEventListener("click", (evt) => {
-        //     evt.preventDefault();
-        //     $(".hidden-link-modal").click();
-        //     $("#new-url").val("");
-        //     $("#current-url").val(evt.currentTarget.href);
-        //     newUrl = updatedHREF[d];
-        //     ((evt.currentTarget).outerHTML) ? $("#alias").val(evt.currentTarget.getAttribute("alias")) : $("#alias").val("");
-        // })
-    }
 }
+
+$("#save-changes-url").click(() => {
+    if ($("#new-url").val()) newUrl.href = $("#new-url").val();
+    if ($("#alias").val()) newUrl.setAttribute("alias", $("#alias").val());
+    modifiedCodeUpdate();
+})
 
 let handleHREFTrack = function () {
     let flag = 0;
@@ -138,7 +140,7 @@ let handleAnchorHighlight = function (evt) {
 
     let fragment = document.createDocumentFragment();
 
-    updatedHREF.forEach((href, index) => { 
+    updatedHREF.forEach((href, index) => {
         let container = document.createElement('div');
         container.className = 'iframe-input-container';
 
@@ -169,7 +171,7 @@ let handleAnchorHighlight = function (evt) {
         inputField.id = `input-anchor-${index + 1}`;
         inputField.placeholder = 'Enter new href';
         inputField.className = 'new-url form-control';
-        inputField.addEventListener('keyup',()=>$('#save-changes-anchor').removeClass('disabled'))
+        inputField.addEventListener('keyup', () => $('#save-changes-anchor').removeClass('disabled'))
         inputContainer.appendChild(inputField);
 
         let aliasField = document.createElement('input');
@@ -178,7 +180,7 @@ let handleAnchorHighlight = function (evt) {
         aliasField.placeholder = 'Enter alias';
         aliasField.className = 'alias-url form-control';
         aliasField.value = href.anchor.getAttribute("alias") || '';
-        aliasField.addEventListener('keyup',()=>$('#save-changes-anchor').removeClass('disabled'))
+        aliasField.addEventListener('keyup', () => $('#save-changes-anchor').removeClass('disabled'))
         inputContainer.appendChild(aliasField);
 
         let copyButton = document.createElement('button');
@@ -202,8 +204,7 @@ let handleAnchorHighlight = function (evt) {
     anchorModalBody.appendChild(fragment);
 
     document.getElementById("save-changes-anchor").onclick = function () {
-        anchorFlag = 1;
-        updatedHREF.forEach((href, index) => {            
+        updatedHREF.forEach((href, index) => {
             let checkbox = document.getElementById(`checkbox-anchor-${index + 1}`);
             if (checkbox.checked) {
                 let newHref = document.getElementById(`input-anchor-${index + 1}`).value.trim();
@@ -238,7 +239,7 @@ let anchorRefresh = function () {
 function handleCSVUpload(event) {
     const file = event.target.files[0];
     if (file.type !== 'text/csv') {
-        handleToast('Please upload a valid CSV file','error');
+        handleToast('Please upload a valid CSV file', 'error');
         $('#upload-csv').val('');
         return;
     }
@@ -253,7 +254,7 @@ function handleCSVUpload(event) {
         const aliasIndex = headers.indexOf('alias');
 
         if (newUrlIndex === -1 || aliasIndex === -1) {
-            handleToast('CSV must contain "new-url" and "alias" columns','error');
+            handleToast('CSV must contain "new-url" and "alias" columns', 'error');
             return;
         }
 
@@ -286,16 +287,10 @@ function handleCSVUpload(event) {
     handleToast('New URLs loaded succesfully', 'success');
 }
 
-$("#save-changes-url").click(() => {
-    if ($("#new-url").val()) newUrl.href = $("#new-url").val();
-    if ($("#alias").val()) newUrl.setAttribute("alias", $("#alias").val());
-    modifiedCodeUpdate();
-})
-
-let handleExtraction = async function () {
+let handleImageExtraction = async function () {
     let IMGmatches = new Map();
     let j;
-    for (j = 0; j < m; j++) {
+    for (j = 0; j < iFrameLength; j++) {
         let IMGelems = iframes[1].contentDocument.getElementsByTagName("img");
         let IMGBgelems = iframes[1].contentDocument.getElementsByTagName("td");
         for (let d = 0; d < IMGelems.length; d++) {
@@ -312,7 +307,7 @@ let handleExtraction = async function () {
 
     let fragment = document.createDocumentFragment();
 
-    IMGmatches.forEach((alt, src) => {   
+    IMGmatches.forEach((alt, src) => {
         let container = document.createElement('div');
         container.className = 'iframe-input-container';
 
@@ -333,7 +328,7 @@ let handleExtraction = async function () {
         imgElement.src = src;
         imgElement.alt = alt;
         imgElement.className = 'img-preview';
-        
+
         imgContainer.appendChild(imgElement);
         imgContainerOuter.appendChild(imgContainer);
         inputContainer.appendChild(imgContainerOuter);
@@ -351,7 +346,7 @@ let handleExtraction = async function () {
         inputImgField.id = `input-img-${src}`;
         inputImgField.placeholder = 'Enter new src';
         inputImgField.className = 'new-img form-control';
-        inputImgField.addEventListener('keyup',()=>$('#save-changes-img').removeClass('disabled'));
+        inputImgField.addEventListener('keyup', () => $('#save-changes-img').removeClass('disabled'));
         inputContainer.appendChild(inputImgField);
 
         let altField = document.createElement('input');
@@ -360,7 +355,7 @@ let handleExtraction = async function () {
         altField.placeholder = 'Enter alt text';
         altField.className = 'alt-url form-control';
         altField.value = alt;
-        altField.addEventListener('keyup',()=>$('#save-changes-img').removeClass('disabled'));
+        altField.addEventListener('keyup', () => $('#save-changes-img').removeClass('disabled'));
         inputContainer.appendChild(altField);
 
         container.appendChild(inputContainer);
@@ -384,16 +379,16 @@ let handleExtraction = async function () {
                 }
             }
         });
-        handleToast('Changes saved successfully','success');
+        handleToast('Changes saved successfully', 'success');
         modifiedCodeUpdate();
     };
     setTimeout(() => {
-        $('.img-container').each(function() {
+        $('.img-container').each(function () {
             $(this).hover(
-                function() {
+                function () {
                     $(this).css("overflow", "visible");
                 },
-                function() {
+                function () {
                     $(this).css("overflow", "hidden");
                 }
             );
@@ -438,7 +433,7 @@ let handleImageDownload = function (IMGDownload) {
 
 $("#start-regex-phrase").val(`\\[\\#if`)
 $("#end-regex-phrase").val(`\\#if\\]`);
-$("#regex-submit").click(()=>{
+$("#regex-submit").click(() => {
     let start = $("#start-regex-phrase").val();
     let end = $("#end-regex-phrase").val();
     let iFrameCode = document.querySelector("#modified-iframe").contentDocument.documentElement.outerHTML;
@@ -451,32 +446,32 @@ $("#regex-submit").click(()=>{
     let fragment = document.createDocumentFragment();
 
     console.log(regexMatches);
-    if (regexMatches == null || regexMatches.length == 0 ) {
+    if (regexMatches == null || regexMatches.length == 0) {
         $('#inner-personalisation-modal-body').html('No Results Found')
     }
-    else{
+    else {
         regexMatches.forEach((script, idx) => {
             let container = document.createElement('div');
             container.className = 'iframe-input-container';
-    
+
             let inputContainer = document.createElement('div');
             inputContainer.className = 'input-container d-flex flex-grow-1 m-0';
-    
+
             let currentPersonalisation = document.createElement('textarea');
             currentPersonalisation.type = 'text';
             currentPersonalisation.value = script;
             currentPersonalisation.readOnly = true;
             currentPersonalisation.id = `current-personalisation-${idx}`;
             currentPersonalisation.className = 'current-personalisation form-control';
-            currentPersonalisation.setAttribute('rows',7);
+            currentPersonalisation.setAttribute('rows', 7);
             inputContainer.appendChild(currentPersonalisation);
-    
+
             let inputPersonalisation = document.createElement('textarea');
             inputPersonalisation.type = 'text';
             inputPersonalisation.id = `input-personalisation-${idx}`;
             inputPersonalisation.placeholder = 'Enter Replacement Script';
             inputPersonalisation.className = 'new-personalisation form-control';
-            inputPersonalisation.setAttribute('rows',7);
+            inputPersonalisation.setAttribute('rows', 7);
             inputContainer.appendChild(inputPersonalisation);
 
             let checkboxContainer = document.createElement('div');
@@ -488,7 +483,7 @@ $("#regex-submit").click(()=>{
             checkbox.checked = true;
             checkboxContainer.appendChild(checkbox)
             inputContainer.appendChild(checkboxContainer);
-    
+
             container.appendChild(inputContainer);
             fragment.appendChild(container);
         });
@@ -497,17 +492,17 @@ $("#regex-submit").click(()=>{
 
     document.getElementById("save-changes-personalisation").onclick = function () {
         let updatedCode = iFrameCode;
-        
-            regexMatches.forEach((script, index) => {
-                let checkbox = document.getElementById(`checkbox-personalisation-${index}`);
-                if (checkbox.checked) {
-                    let newScript = document.getElementById(`input-personalisation-${index}`).value.trim();
-                    updatedCode = updatedCode.replace(script, newScript);
-                }
-            });  
-    
+
+        regexMatches.forEach((script, index) => {
+            let checkbox = document.getElementById(`checkbox-personalisation-${index}`);
+            if (checkbox.checked) {
+                let newScript = document.getElementById(`input-personalisation-${index}`).value.trim();
+                updatedCode = updatedCode.replace(script, newScript);
+            }
+        });
+
         modifiedCode.value = HTMLDocStandard + "\n" + updatedCode;
-        handleToast('Changes saved successfully','success')
+        handleToast('Changes saved successfully', 'success')
         modifiedIframeCodeUpdate(modifiedCode.value);
         handleEventsInAnchor();
     };
@@ -519,7 +514,7 @@ let handleAmpscript = async function () {
     PersonalisationModalBody.innerHTML = '';
 }
 
-let handleCodeCompare = function(){
+let handleCodeCompare = function () {
     $("#editor-container").toggleClass('some-style');
     $("#modified-code-container").toggleClass('some-style2');
     $("#original-code-container").toggleClass('some-style2 d-none');
@@ -601,14 +596,14 @@ function handleFileUpload(evt) {
 
 $("#save-changes-upload").click(() => {
     readFile(fileToUpload);
-    handleToast(`${fileToUpload.name} is uploaded successfully`,'success')
+    handleToast(`${fileToUpload.name} is uploaded successfully`, 'success')
     $(".sidebar").toggleClass('show');
     $(".code-editor").toggleClass('reduced');
     $(".nav-tabs").toggleClass('show');
     $(".header-button-container, .inner-header-button-container").toggleClass('d-none');
     $(".logo-container").toggleClass('show');
     $("#submit-container").toggleClass("d-none");
-    
+
     $("#editor-container").removeClass('some-style');
     $("#original-code-container, #modified-code-container").removeClass('some-style2');
     $("#original-code-container").removeClass('d-none');
@@ -619,7 +614,6 @@ $("#save-changes-upload").click(() => {
     $(".tab-menu").removeClass("d-none");
     $("#iframe-container").addClass("d-none");
     $("#download-btn-container").toggleClass('d-none');
-    anchorFlag = 0;
 })
 
 async function readFile(file) {
@@ -715,17 +709,18 @@ let handleToast = function (toastMessage, toastType) {
     })
 }
 
-$(".nav-link").click((evt)=>{
+$(".nav-link").click((evt) => {
     $(".nav-link").removeClass("active");
     $(evt.target).addClass("active");
     $(".tab-menu").removeClass("d-none");
-    $('#'+$(evt.target).attr('tab')).addClass("d-none")
+    $('#' + $(evt.target).attr('tab')).addClass("d-none")
 })
 
 function isSelfClosingTag(tagName) {
     return tagName.match(/area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr|script/i);
-  }
-  $('#unclosed-tag-finder-button').click(function() {
+}
+
+$('#unclosed-tag-finder-button').click(function () {
     var input = $('#original-file').val();
 
     // Line numbering code from https://jsfiddle.net/tovic/AbpRD/
@@ -736,63 +731,63 @@ function isSelfClosingTag(tagName) {
     pre.innerHTML = '<span class="line-number"><\/span>' + pre.innerHTML + '<span class="cl"><\/span>';
     var num = pre.innerHTML.split(/\n/).length;
     for (var j = 0; j < num; j++) {
-      var line_num = pre.getElementsByTagName('span')[0];
-      line_num.innerHTML += '<span>' + (j + 1) + '<\/span>';
+        var line_num = pre.getElementsByTagName('span')[0];
+        line_num.innerHTML += '<span>' + (j + 1) + '<\/span>';
     }
 
     var tags = [];
     // Strip out comments first.
     input = input.replace(/<!--[\s\S]*?-->/g, '');
-    $.each(input.split('\n'), function(i, line) {
-      $.each(line.match(/<[^>]*[^/]>/g) || [], function(j, tag) {
-        var matches = tag.match(/<\/?([a-z0-9]+)/i);
-        if (matches) {
-          tags.push({
-            tag: tag,
-            name: matches[1],
-            line: i + 1,
-            closing: tag[1] == '/'
-          });
-        }
-      });
+    $.each(input.split('\n'), function (i, line) {
+        $.each(line.match(/<[^>]*[^/]>/g) || [], function (j, tag) {
+            var matches = tag.match(/<\/?([a-z0-9]+)/i);
+            if (matches) {
+                tags.push({
+                    tag: tag,
+                    name: matches[1],
+                    line: i + 1,
+                    closing: tag[1] == '/'
+                });
+            }
+        });
     });
     if (tags.length == 0) {
-      $('#unclosed-tag-finder-results').text('No tags found.');
-      return;
+        $('#unclosed-tag-finder-results').text('No tags found.');
+        return;
     }
     var openTags = [];
     var error = false;
     var indent = 0;
     for (var i = 0; i < tags.length; i++) {
-      var tag = tags[i];
-      if (tag.closing) {
-        var closingTag = tag;
-        if (isSelfClosingTag(closingTag.name)) {
-          continue;
-        }
-        if (openTags.length == 0) {
-          $('#unclosed-tag-finder-results').text('Closing tag ' + closingTag.tag + ' on line ' + closingTag.line + ' does not have corresponding open tag.');
-          return;
-        }
-        var openTag = openTags[openTags.length - 1];
-        if (closingTag.name != openTag.name) {
-          $('#unclosed-tag-finder-results').text('Closing tag ' + closingTag.tag + ' on line ' + closingTag.line + ' does not match open tag ' + openTag.tag + ' on line ' + openTag.line + '.');
-          return;
+        var tag = tags[i];
+        if (tag.closing) {
+            var closingTag = tag;
+            if (isSelfClosingTag(closingTag.name)) {
+                continue;
+            }
+            if (openTags.length == 0) {
+                $('#unclosed-tag-finder-results').text('Closing tag ' + closingTag.tag + ' on line ' + closingTag.line + ' does not have corresponding open tag.');
+                return;
+            }
+            var openTag = openTags[openTags.length - 1];
+            if (closingTag.name != openTag.name) {
+                $('#unclosed-tag-finder-results').text('Closing tag ' + closingTag.tag + ' on line ' + closingTag.line + ' does not match open tag ' + openTag.tag + ' on line ' + openTag.line + '.');
+                return;
+            } else {
+                openTags.pop();
+            }
         } else {
-          openTags.pop();
+            var openTag = tag;
+            if (isSelfClosingTag(openTag.name)) {
+                continue;
+            }
+            openTags.push(openTag);
         }
-      } else {
-        var openTag = tag;
-        if (isSelfClosingTag(openTag.name)) {
-          continue;
-        }
-        openTags.push(openTag);
-      }
     }
     if (openTags.length > 0) {
-      var openTag = openTags[openTags.length - 1];
-      $('#unclosed-tag-finder-results').text('Open tag ' + openTag.tag + ' on line ' + openTag.line + ' does not have a corresponding closing tag.');
-      return;
+        var openTag = openTags[openTags.length - 1];
+        $('#unclosed-tag-finder-results').text('Open tag ' + openTag.tag + ' on line ' + openTag.line + ' does not have a corresponding closing tag.');
+        return;
     }
     $('#unclosed-tag-finder-results').text('Success: No unclosed tags found.');
-  });
+});
