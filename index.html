@@ -48,13 +48,16 @@
                     <button class="btn btn-dark position-relative save-changes-btn"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2">upload</span>Create a new test <input class="cursor-pointer position-absolute top-0 start-0 opacity-0" type="file" name="" id="upload-new-file"></button>
                 </div>
                 <div class="d-flex gap-3">
-                    <a id="download-btn" href="no-script.html" class="btn btn-light border border-purple disabled color-purple" title="Downloads Modified HTML file" disabled><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2 color-purple">Download</span>Download HTML</a>
-                    <button class="btn btn-light border border-purple color-purple"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2"><span class="material-symbols-outlined color-purple">mobile_friendly</span></span>Email Validation</button>
-                    <button class="btn btn-light border border-purple color-purple"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2"><span class="material-symbols-outlined color-purple">format_list_bulleted</span></span>Source Format</button>
-                    <button class="btn btn-light border border-purple color-purple"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2 color-purple">description</span>Compress Size</button>
+                    <a href="no-script.html" class="btn btn-light border border-purple disabled color-purple download-btn" title="Downloads Modified HTML file" disabled><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2 color-purple">Download</span>Download HTML</a>
+                    <a href="https://automation.epsilon.com/checkmate/home" target="_blank" class="btn btn-light border border-purple color-purple" title="Validates HTML file"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2 color-purple">mobile_friendly</span>Email Validation</a>
+                    <a href="https://smalldev.tools/html-formatter-online" target="_blank" class="btn btn-light border border-purple color-purple" title="Source FOrmatter for HTML file"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2 color-purple">format_list_bulleted</span>Source Format</a>
+                    <a href="https://htmlcompressor.com/compressor/" target="_blank" class="btn btn-light border border-purple color-purple" title="Compress Size of HTML file"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2 color-purple">description</span>Compress Size</a>
+                    <!-- <button class="btn btn-light border border-purple color-purple" id="unclosed-tag-finder-button"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-2 color-purple">description</span>Validation</button> -->
                 </div>
             </div>
         </div>
+        <div class="d-none" id="unclosed-tag-finder-code"></div>
+        <div id="unclosed-tag-finder-results"></div>
 
 
         <div class="content-container d-flex flex-column pt-3 position-relative">
@@ -74,9 +77,11 @@
                                 <span class="material-symbols-outlined color-purple" style="font-size: 60px; ">delete</span>
                             </div>
                             <div class="d-flex flex-column">
-                                <div class="side-menu-label fw-bold">Remove Personalisation</div>
-                                <div class="side-menu-label pt-2">Header</div>
-                                <div class="side-menu-label text-decoration-underline pt-1 cursor-pointer" onclick="handleAmpscript()">Salutation</div>
+                                <div class="side-menu-label fw-bold">Personalisation</div>
+                                <!-- <div class="side-menu-label pt-2">Header</div> -->
+                                <div class="side-menu-label text-decoration-underline pt-1 cursor-pointer" onclick="handleAmpscript()">Remove Personalisation</div>
+                                <div class="side-menu-label pt-2 text-decoration-underline cursor-pointer" onclick="handleHREFTrack()" class="btn btn-dark"
+                                title="Highlights all the Anchor tag in the code">Remove Tracking URL</div>
                             </div>
                         </div>
                     </li>
@@ -87,8 +92,6 @@
                             </div>
                             <div class="d-flex flex-column">
                                 <div class="side-menu-label fw-bold">Links</div>
-                                <div class="side-menu-label pt-2 text-decoration-underline cursor-pointer" onclick="handleHREFTrack()" class="btn btn-dark"
-                                title="Highlights all the Anchor tag in the code">Remove Tracking URL</div>
                                 <div class="side-menu-label text-decoration-underline pt-1 cursor-pointer" onclick="handleAnchorHighlight()" class="btn btn-dark"
                                 title="Highlights all the Anchor tag in the code">Manual Update</div>
                                 <div class="side-menu-label text-decoration-underline pt-1 cursor-pointer" >Document Upload</div>
@@ -114,7 +117,7 @@
                             </div>
                             <div class="d-flex flex-column">
                                 <div class="side-menu-label fw-bold">Code Compare</div>
-                                <div class="side-menu-label pt-2 text-decoration-underline cursor-pointer" onclick="handleCodeCompare()" title="Toggle for Code Comaparison">Existing vs New</div>
+                                <div class="side-menu-label pt-2 text-decoration-underline cursor-pointer btn p-0 border-0 disabled" id="code-compare" onclick="handleCodeCompare()" title="Toggle for Code Comaparison">Existing vs New</div>
                             </div>
                         </div>
                     </li>
@@ -138,7 +141,7 @@
                     <div class="fw-bold fs-5 d-none inner-original-btn color-purple" >Original</div>
                     <div class="fw-bold fs-5 color-purple" >Modified</div>
                 </div>
-                <div id="editor-container" class="tab-menu editor w-100 position-relative" style="flex-grow: 1;">
+                <div id="editor-container" class="position-relative tab-menu editor w-100 position-relative" style="flex-grow: 1;">
                     <div class="h-100" id="original-code-container">
                         <div class="rounded h-header">
                             <textarea class="lineTextarea" id="original-line-counter" style="border-radius: 5px;" wrap='off'
@@ -179,9 +182,13 @@
                                 <textarea class="lineTextarea" id='modified-line-counter' style="border-radius: 5px;" wrap='off'
                                     readonly>1.</textarea>
                                 <textarea class="codeTextarea" style="border-radius: 5px;" oninput="line_counter('modified')"
-                                    onscroll="line_scroll('modified')" id='modified-file' wrap='off'></textarea>
+                                    onscroll="line_scroll('modified')" id='modified-file' wrap='off' readonly></textarea>
                             </div>
                         </div>
+                    </div>
+                    <div class="d-flex position-absolute bottom-0 end-0 d-none" id="download-btn-container">
+                        <div id="copy-btn" class="btn btn-light border border-purple disabled color-purple" title="Copies HTML Code"><span class="material-symbols-outlined">content_copy</span></div>
+                        <a href="no-script.html" class="btn btn-light border border-purple disabled color-purple download-btn" title="Downloads Modified HTML file"><span style="vertical-align: bottom;" class="material-symbols-outlined pe-0 color-purple">Download</span></a>
                     </div>
                 </div>
                 <div id="iframe-container" class="tab-menu d-none position-relative w-100 border border-top-0 rounded-bottom d-flex justify-content-around align-items-center px-3 pb-3 gap-3" style="flex-grow: 1;">

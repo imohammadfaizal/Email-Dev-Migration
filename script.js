@@ -9,7 +9,9 @@ let originalWrapper = document.getElementById('original-wrapper');
 let modifiedWrapper = document.getElementById('modified-wrapper');
 let iframes = document.getElementsByTagName('iframe');
 let m = iframes.length;
-let HREF;
+let originalHREF;
+let updatedHREF = [];
+let anchorFlag = 0;
 let newUrl;
 let fileToUpload;
 document.getElementById('upload-file').addEventListener('change', handleFileUpload, false);
@@ -24,6 +26,7 @@ $("#original-file").keyup(() => {
         $("#submit-btn").addClass("disabled") 
     }
 })
+
 $(".regex-phrase").keyup(() => { 
     if($("#start-regex-phrase").val() && $("#end-regex-phrase").val()) {
          $("#regex-submit").removeClass("disabled"); 
@@ -51,6 +54,8 @@ function modifiedIframeCodeUpdate(codeToUpdate) {
 
 function modifiedCodeUpdate(){
     modifiedCode.value = HTMLDocStandard + "\n" + document.querySelector("#modified-iframe").contentDocument.documentElement.outerHTML;
+    line_counter('modified');
+    disableDownload();
 }
 
 let handleSubmit = async function () {
@@ -61,39 +66,52 @@ let handleSubmit = async function () {
     $(".header-button-container, .inner-header-button-container").toggleClass('d-none');
     $(".logo-container").toggleClass('show');
     $("#submit-container").toggleClass("d-none");
+    $("#original-file").attr('readonly');
+    $("#download-btn-container").toggleClass('d-none');
+    $("#modified-code-container").toggleClass('d-none');
+    $("#original-code-container").toggleClass('d-none');
     await originalIframeCodeUpdate(originalCode.value);
     await modifiedIframeCodeUpdate(originalCode.value);
+    $("#modified-file").val($("#original-file").val());
+    line_counter('modified');
     handleEventsInAnchor();
     // handleToast('Submission successful','success');
 }
 
 let handleEventsInAnchor = function () {
     for (let j = 0; j < m; j++) {
-        HREF = iframes[1].contentDocument.querySelectorAll("a");        
+        originalHREF = iframes[0].contentDocument.querySelectorAll("a");       
     }
-    for (let d = 0; d < HREF.length; d++) {
-        HREF[d].addEventListener("click", (evt) => {
-            evt.preventDefault();
-            $(".hidden-link-modal").click();
-            $("#new-url").val("");
-            $("#current-url").val(evt.currentTarget.href);
-            newUrl = HREF[d];
-            ((evt.currentTarget).outerHTML) ? $("#alias").val(evt.currentTarget.getAttribute("alias")) : $("#alias").val("");
-        })
+    for (let j = 1; j < m; j++) {
+        const anchors = iframes[1].contentDocument.querySelectorAll("a");
+        anchors.forEach(anchor => {
+            updatedHREF.push({ anchor: anchor, flag: 0 });
+        });
+    }
+    
+    for (let d = 0; d < updatedHREF.length; d++) {
+        // updatedHREF[d].addEventListener("click", (evt) => {
+        //     evt.preventDefault();
+        //     $(".hidden-link-modal").click();
+        //     $("#new-url").val("");
+        //     $("#current-url").val(evt.currentTarget.href);
+        //     newUrl = updatedHREF[d];
+        //     ((evt.currentTarget).outerHTML) ? $("#alias").val(evt.currentTarget.getAttribute("alias")) : $("#alias").val("");
+        // })
     }
 }
 
 let handleHREFTrack = function () {
-    for (let d = 0; d < HREF.length; d++) {
-        let HREFTag = HREF[d].href;
+    let flag = 0;
+    for (let d = 0; d < updatedHREF.length; d++) {
+        let HREFTag = updatedHREF[d].href;
         if (HREFTag && HREFTag !== regexCall(HREFTag)) {
-            HREF[d].href = regexCall(HREFTag);
+            updatedHREF[d].href = regexCall(HREFTag);
+            modifiedCodeUpdate();
+            flag++;
         }
     }
-    handleToast('Tracking URL removed successfully', 'success');
-    modifiedCodeUpdate();
-    line_counter('modified');
-    disableDownload();
+    flag === 0 ? handleToast('No Link changed', 'error') : handleToast('Tracking URL removed successfully', 'success');
     anchorRefresh();
 }
 
@@ -120,7 +138,7 @@ let handleAnchorHighlight = function (evt) {
 
     let fragment = document.createDocumentFragment();
 
-    HREF.forEach((href, index) => {   
+    updatedHREF.forEach((href, index) => { 
         let container = document.createElement('div');
         container.className = 'iframe-input-container';
 
@@ -129,7 +147,7 @@ let handleAnchorHighlight = function (evt) {
         iframe.height = '50';
         iframe.className = 'anchor-iframe';
         iframe.scrolling = 'no';
-        iframe.srcdoc = `<div class="iframe-inner-container">${href.outerHTML}</div>`;
+        iframe.srcdoc = `<div class="iframe-inner-container">${href.anchor.outerHTML}</div>`;
         container.appendChild(iframe);
 
         let inputContainer = document.createElement('div');
@@ -137,8 +155,8 @@ let handleAnchorHighlight = function (evt) {
 
         let currentUrlField = document.createElement('input');
         currentUrlField.type = 'text';
-        currentUrlField.value = href.href;
-        currentUrlField.title = href.href;
+        currentUrlField.value = originalHREF[index];
+        currentUrlField.title = originalHREF[index];
         currentUrlField.readOnly = true;
         currentUrlField.id = `current-anchor-${index + 1}`;
         currentUrlField.className = 'current-url form-control';
@@ -146,6 +164,8 @@ let handleAnchorHighlight = function (evt) {
 
         let inputField = document.createElement('input');
         inputField.type = 'text';
+        inputField.value = href.flag === 1 ? href.anchor.href : "";
+        inputField.title = href.flag === 1 ? href.anchor.href : "";
         inputField.id = `input-anchor-${index + 1}`;
         inputField.placeholder = 'Enter new href';
         inputField.className = 'new-url form-control';
@@ -157,7 +177,7 @@ let handleAnchorHighlight = function (evt) {
         aliasField.id = `alias-anchor-${index + 1}`;
         aliasField.placeholder = 'Enter alias';
         aliasField.className = 'alias-url form-control';
-        aliasField.value = href.getAttribute("alias") || '';
+        aliasField.value = href.anchor.getAttribute("alias") || '';
         aliasField.addEventListener('keyup',()=>$('#save-changes-anchor').removeClass('disabled'))
         inputContainer.appendChild(aliasField);
 
@@ -182,7 +202,8 @@ let handleAnchorHighlight = function (evt) {
     anchorModalBody.appendChild(fragment);
 
     document.getElementById("save-changes-anchor").onclick = function () {
-        HREF.forEach((href, index) => {
+        anchorFlag = 1;
+        updatedHREF.forEach((href, index) => {            
             let checkbox = document.getElementById(`checkbox-anchor-${index + 1}`);
             if (checkbox.checked) {
                 let newHref = document.getElementById(`input-anchor-${index + 1}`).value.trim();
@@ -191,7 +212,8 @@ let handleAnchorHighlight = function (evt) {
                 let anchor = mainIframe.contentDocument.querySelectorAll('a')[index];
 
                 if (anchor && anchor.hasAttribute('href')) {
-                    anchor.href = newHref || href.href;
+                    anchor.href = newHref || href.anchor.href;
+                    newHref ? href.flag = 1 : href.flag = 0;
                     if (alias) {
                         anchor.setAttribute("alias", alias);
                     } else {
@@ -201,14 +223,12 @@ let handleAnchorHighlight = function (evt) {
             }
         });
         modifiedCodeUpdate();
-        line_counter('modified');
-        disableDownload();
         handleToast('Anchor Links have been updated successfully', 'success');
     };
 };
 
 let anchorRefresh = function () {
-    HREF.forEach((href, index) => {
+    updatedHREF.forEach((href, index) => {
         let currentUrlField = document.getElementById(`current-anchor-${index + 1}`);
         currentUrlField.value = href.href;
         currentUrlField.title = href.href;
@@ -243,7 +263,7 @@ function handleCSVUpload(event) {
             const newUrl = columns[newUrlIndex]?.trim() || '';
             const alias = columns[aliasIndex]?.trim() || '';
 
-            while (currentIndex < HREF.length) {
+            while (currentIndex < updatedHREF.length) {
                 const currentUrlField = document.getElementById(`current-anchor-${currentIndex + 1}`);
 
                 if (currentUrlField && currentUrlField.value.trim() !== '') {
@@ -270,8 +290,6 @@ $("#save-changes-url").click(() => {
     if ($("#new-url").val()) newUrl.href = $("#new-url").val();
     if ($("#alias").val()) newUrl.setAttribute("alias", $("#alias").val());
     modifiedCodeUpdate();
-    line_counter('modified');
-    disableDownload();
 })
 
 let handleExtraction = async function () {
@@ -368,8 +386,6 @@ let handleExtraction = async function () {
         });
         handleToast('Changes saved successfully','success');
         modifiedCodeUpdate();
-        line_counter('modified');
-        disableDownload();
     };
     setTimeout(() => {
         $('.img-container').each(function() {
@@ -505,12 +521,12 @@ let handleAmpscript = async function () {
 
 let handleCodeCompare = function(){
     $("#editor-container").toggleClass('some-style');
-    $("#original-code-container").toggleClass('some-style2');
-    $("#modified-code-container").toggleClass('some-style2 d-none');
+    $("#modified-code-container").toggleClass('some-style2');
+    $("#original-code-container").toggleClass('some-style2 d-none');
     $("#original-wrapper, .inner-original-btn").toggleClass('d-none');
 }
 
-$('#download-btn').click(function (e) {
+$('.download-btn').click(function (e) {
     e.preventDefault();
     const link = document.createElement("a");
     const file = new Blob([modifiedCode.value], { type: 'text/plain' });
@@ -520,12 +536,16 @@ $('#download-btn').click(function (e) {
     URL.revokeObjectURL(link.href);
 });
 
+$('#copy-btn').click(function (e) {
+    navigator.clipboard.writeText($('#modified-file').val());
+});
+
 function disableDownload() {
     if (modifiedCode.value == "") {
-        $('#download-btn').addClass("disabled");
+        $('.download-btn, #copy-btn, #code-compare').addClass("disabled");
     }
     else {
-        $('#download-btn').removeClass("disabled");
+        $('.download-btn, #copy-btn, #code-compare').removeClass("disabled");
     }
 }
 
@@ -591,12 +611,15 @@ $("#save-changes-upload").click(() => {
     
     $("#editor-container").removeClass('some-style');
     $("#original-code-container, #modified-code-container").removeClass('some-style2');
+    $("#original-code-container").removeClass('d-none');
     $("#modified-code-container, #original-wrapper, .inner-original-btn").addClass('d-none');
 
     $(".nav-link").removeClass("active");
     $(".code-btn").addClass("active");
     $(".tab-menu").removeClass("d-none");
     $("#iframe-container").addClass("d-none");
+    $("#download-btn-container").toggleClass('d-none');
+    anchorFlag = 0;
 })
 
 async function readFile(file) {
@@ -698,3 +721,78 @@ $(".nav-link").click((evt)=>{
     $(".tab-menu").removeClass("d-none");
     $('#'+$(evt.target).attr('tab')).addClass("d-none")
 })
+
+function isSelfClosingTag(tagName) {
+    return tagName.match(/area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr|script/i);
+  }
+  $('#unclosed-tag-finder-button').click(function() {
+    var input = $('#original-file').val();
+
+    // Line numbering code from https://jsfiddle.net/tovic/AbpRD/
+    $('#unclosed-tag-finder-code').empty();
+    $('#unclosed-tag-finder-code').append('<span><\/span>');
+    $('#unclosed-tag-finder-code span').text(input);
+    var pre = document.getElementById('unclosed-tag-finder-code');
+    pre.innerHTML = '<span class="line-number"><\/span>' + pre.innerHTML + '<span class="cl"><\/span>';
+    var num = pre.innerHTML.split(/\n/).length;
+    for (var j = 0; j < num; j++) {
+      var line_num = pre.getElementsByTagName('span')[0];
+      line_num.innerHTML += '<span>' + (j + 1) + '<\/span>';
+    }
+
+    var tags = [];
+    // Strip out comments first.
+    input = input.replace(/<!--[\s\S]*?-->/g, '');
+    $.each(input.split('\n'), function(i, line) {
+      $.each(line.match(/<[^>]*[^/]>/g) || [], function(j, tag) {
+        var matches = tag.match(/<\/?([a-z0-9]+)/i);
+        if (matches) {
+          tags.push({
+            tag: tag,
+            name: matches[1],
+            line: i + 1,
+            closing: tag[1] == '/'
+          });
+        }
+      });
+    });
+    if (tags.length == 0) {
+      $('#unclosed-tag-finder-results').text('No tags found.');
+      return;
+    }
+    var openTags = [];
+    var error = false;
+    var indent = 0;
+    for (var i = 0; i < tags.length; i++) {
+      var tag = tags[i];
+      if (tag.closing) {
+        var closingTag = tag;
+        if (isSelfClosingTag(closingTag.name)) {
+          continue;
+        }
+        if (openTags.length == 0) {
+          $('#unclosed-tag-finder-results').text('Closing tag ' + closingTag.tag + ' on line ' + closingTag.line + ' does not have corresponding open tag.');
+          return;
+        }
+        var openTag = openTags[openTags.length - 1];
+        if (closingTag.name != openTag.name) {
+          $('#unclosed-tag-finder-results').text('Closing tag ' + closingTag.tag + ' on line ' + closingTag.line + ' does not match open tag ' + openTag.tag + ' on line ' + openTag.line + '.');
+          return;
+        } else {
+          openTags.pop();
+        }
+      } else {
+        var openTag = tag;
+        if (isSelfClosingTag(openTag.name)) {
+          continue;
+        }
+        openTags.push(openTag);
+      }
+    }
+    if (openTags.length > 0) {
+      var openTag = openTags[openTags.length - 1];
+      $('#unclosed-tag-finder-results').text('Open tag ' + openTag.tag + ' on line ' + openTag.line + ' does not have a corresponding closing tag.');
+      return;
+    }
+    $('#unclosed-tag-finder-results').text('Success: No unclosed tags found.');
+  });
