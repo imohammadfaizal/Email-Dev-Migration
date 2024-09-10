@@ -11,6 +11,8 @@ let iframes = document.getElementsByTagName('iframe');
 let iFrameLength = iframes.length;
 let originalHREF;
 let updatedHREF = [];
+let originalIMG =[];
+let updatedIMG = [];
 let newUrl;
 let fileToUpload;
 document.getElementById('upload-file').addEventListener('change', handleFileUpload, false);
@@ -74,6 +76,7 @@ let handleSubmit = async function () {
     $("#modified-file").val($("#original-file").val());
     line_counter('modified');
     handleEventsInAnchor();
+    handleImageStorage();
     // handleToast('Submission successful','success');
 }
 
@@ -204,7 +207,7 @@ let handleAnchorHighlight = function (evt) {
     anchorModalBody.appendChild(fragment);
 
     document.getElementById("save-changes-anchor").onclick = function () {
-        updatedHREF.forEach((href, index) => {
+        updatedHREF.forEach((anchorTag, index) => {
             let checkbox = document.getElementById(`checkbox-anchor-${index + 1}`);
             if (checkbox.checked) {
                 let newHref = document.getElementById(`input-anchor-${index + 1}`).value.trim();
@@ -213,8 +216,8 @@ let handleAnchorHighlight = function (evt) {
                 let anchor = mainIframe.contentDocument.querySelectorAll('a')[index];
 
                 if (anchor && anchor.hasAttribute('href')) {
-                    anchor.href = newHref || href.anchor.href;
-                    newHref ? href.flag = 1 : href.flag = 0;
+                    anchor.href = newHref || anchorTag.anchor.href;
+                    newHref ? anchorTag.flag = 1 : anchorTag.flag = 0;
                     if (alias) {
                         anchor.setAttribute("alias", alias);
                     } else {
@@ -287,27 +290,37 @@ function handleCSVUpload(event) {
     handleToast('New URLs loaded succesfully', 'success');
 }
 
-let handleImageExtraction = async function () {
-    let IMGmatches = new Map();
-    let j;
-    for (j = 0; j < iFrameLength; j++) {
-        let IMGelems = iframes[1].contentDocument.getElementsByTagName("img");
-        let IMGBgelems = iframes[1].contentDocument.getElementsByTagName("td");
-        for (let d = 0; d < IMGelems.length; d++) {
-            IMGmatches.set(IMGelems[d].src, IMGelems[d].alt);
-        }
+let handleImageStorage = function () {
+    for (let j = 0; j < iFrameLength; j++) {
+        let imgs = iframes[0].contentDocument.querySelectorAll("img");
+        let IMGBgelems = iframes[0].contentDocument.getElementsByTagName("td");
+        originalIMG.push(...imgs);
         for (let d = 0; d < IMGBgelems.length; d++) {
-            if (IMGBgelems[d].getAttribute("background")) IMGmatches.set(IMGBgelems[d].getAttribute("background"), "");
+            if (IMGBgelems[d].getAttribute("background")) originalIMG.push(IMGBgelems[d].getAttribute("background"));
         }
     }
+    for (let j = 1; j < iFrameLength; j++) {
+        const images = iframes[1].contentDocument.querySelectorAll("img");
+        let IMGBgelems = iframes[1].contentDocument.getElementsByTagName("td");
+        images.forEach(image => {
+            updatedIMG.push({ image: image, flag: 0 });
+        });
+        for (let d = 0; d < IMGBgelems.length; d++) {
+            if (IMGBgelems[d].getAttribute("background")) updatedIMG.push({ image: IMGBgelems[d].getAttribute("background"), flag: 0, background: true });
+        }
+    }    
+}
+
+let handleImageExtraction = async function () {
     $(".hidden-image-modal").click();
     $('#save-changes-img').addClass('disabled');
     let imageModalBody = document.getElementById("inner-image-modal-body");
     imageModalBody.innerHTML = '';
 
     let fragment = document.createDocumentFragment();
+    
+    updatedIMG.forEach((img, index) => {
 
-    IMGmatches.forEach((alt, src) => {
         let container = document.createElement('div');
         container.className = 'iframe-input-container';
 
@@ -325,8 +338,8 @@ let handleImageExtraction = async function () {
         imgContainer.style.background = '#bbbbbb';
 
         let imgElement = document.createElement('img');
-        imgElement.src = src;
-        imgElement.alt = alt;
+        imgElement.src = originalIMG[index].src;
+        imgElement.alt = originalIMG[index].alt;
         imgElement.className = 'img-preview';
 
         imgContainer.appendChild(imgElement);
@@ -335,15 +348,39 @@ let handleImageExtraction = async function () {
 
         let currentImgField = document.createElement('input');
         currentImgField.type = 'text';
-        currentImgField.value = src;
+        currentImgField.value = originalIMG[index].src;
         currentImgField.readOnly = true;
-        currentImgField.id = `current-img-${src}`;
+        currentImgField.id = `current-img-${index + 1}`;
         currentImgField.className = 'current-img form-control';
         inputContainer.appendChild(currentImgField);
 
+        let imgContainerModifiedOuter = document.createElement('div');
+        imgContainerModifiedOuter.className = 'img-container-outer';
+        imgContainerModifiedOuter.style.background = '#bbbbbb';
+        imgContainerModifiedOuter.style.padding = '5px';
+        imgContainerModifiedOuter.style.marginBottom = '10px';
+
+        let imgContainerModified = document.createElement('div');
+        imgContainerModified.className = 'img-container';
+        imgContainerModified.id = `img-container-${index + 1}`;
+        imgContainerModified.style.background = '#bbbbbb';
+
+        let imgElementModified = document.createElement('img');
+        imgElementModified.src = img.flag === 1 ? img.image.src : "";
+        imgElementModified.alt = originalIMG[index].alt;
+        imgElementModified.className = 'img-preview';
+        imgElementModified.id = `img-preview-${index + 1}`;
+
+        imgContainerModified.appendChild(imgElementModified);
+        imgContainerModifiedOuter.appendChild(imgContainerModified);
+        img.flag === 1 ? imgContainerModified.classList.add('visible') : imgContainerModified.classList.add('invisible');
+        inputContainer.appendChild(imgContainerModifiedOuter);
+
         let inputImgField = document.createElement('input');
         inputImgField.type = 'text';
-        inputImgField.id = `input-img-${src}`;
+        inputImgField.value = img.flag === 1 ? img.image.src : "";
+        inputImgField.title = img.flag === 1 ? img.image.src : "";
+        inputImgField.id = `input-img-${index + 1}`;
         inputImgField.placeholder = 'Enter new src';
         inputImgField.className = 'new-img form-control';
         inputImgField.addEventListener('keyup', () => $('#save-changes-img').removeClass('disabled'));
@@ -351,10 +388,10 @@ let handleImageExtraction = async function () {
 
         let altField = document.createElement('input');
         altField.type = 'text';
-        altField.id = `alt-img-${src}`;
+        altField.id = `alt-img-${index+1}`;
         altField.placeholder = 'Enter alt text';
         altField.className = 'alt-url form-control';
-        altField.value = alt;
+        altField.value = img.image.alt;
         altField.addEventListener('keyup', () => $('#save-changes-img').removeClass('disabled'));
         inputContainer.appendChild(altField);
 
@@ -364,14 +401,15 @@ let handleImageExtraction = async function () {
     imageModalBody.appendChild(fragment);
 
     document.getElementById("save-changes-img").onclick = function () {
-        IMGmatches.forEach((alt, src) => {
-            let newSrc = document.getElementById(`input-img-${src}`).value.trim();
-            let newAlt = document.getElementById(`alt-img-${src}`).value.trim();
+        updatedIMG.forEach((imageTag,idx) => {
+            let newSrc = document.getElementById(`input-img-${idx + 1}`).value.trim();
+            let newAlt = document.getElementById(`alt-img-${idx + 1}`).value.trim();
             let mainIframe = document.getElementById('modified-iframe');
-            let img = mainIframe.contentDocument.querySelector(`img[src="${src}"]`);
-
+            let img = mainIframe.contentDocument.querySelector(`img[src="${originalIMG[idx].src}"]`);
+    
             if (img && img.hasAttribute('src')) {
-                img.src = newSrc || src;
+                img.src = newSrc || imageTag.image.src;
+                newSrc ? imageTag.flag = 1 : imageTag.flag = 0;
                 if (newAlt) {
                     img.setAttribute("alt", newAlt);
                 } else {
@@ -382,6 +420,16 @@ let handleImageExtraction = async function () {
         handleToast('Changes saved successfully', 'success');
         modifiedCodeUpdate();
     };
+    $(".new-img").keyup(function (){
+        let idx = $(this).attr('id').slice(-1);
+        if($(this).val() === ''){
+            $(`#img-container-${idx}`).addClass('invisible');
+        }
+        else{
+            $(`#img-preview-${idx}`).attr('src' , $(this).val());
+            $(`#img-container-${idx}`).removeClass('invisible');
+        }
+    })
     setTimeout(() => {
         $('.img-container').each(function () {
             $(this).hover(
@@ -394,7 +442,7 @@ let handleImageExtraction = async function () {
             );
         });
     }, 0);
-    // handleImageDownload(IMGmatches); //Added For Image Download
+    // handleImageDownload(originalIMG); //Added For Image Download
 }
 
 let handleImageDownload = function (IMGDownload) {
