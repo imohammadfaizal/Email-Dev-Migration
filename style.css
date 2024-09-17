@@ -1,3 +1,6 @@
+*, body{
+    box-sizing: border-box;
+}
 body, html{
     height: 100%;
     font-family: open sans, Arial, Helvetica, sans-serif;
@@ -175,8 +178,11 @@ body, html{
     background-color: #4caf50; /* Green */
     transition: width 0.3s ease-in-out;
 }
-#anchorModal, #imageUpdateModal, #removePersonalisationModal{
+#imageUpdateModal{
     --bs-modal-width: 1620px;
+}
+#anchorModal, #removePersonalisationModal{
+    --bs-modal-width: 1400px;
 }
 .iframe-input-container {
     display: flex;
@@ -352,4 +358,8 @@ body, html{
 #upload-new-file::-webkit-file-upload-button{
     height: 35px;
     cursor: pointer;
+}
+
+.modal-heading{
+    box-shadow: 0 0 10px 0 hsla(0, 0%, 7%, .06), 0 10px 28px 0 hsla(0, 0%, 7%, .04);
 }

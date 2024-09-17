@@ -59,7 +59,7 @@ function modifiedCodeUpdate() {
     disableDownload();
 }
 
-let handleSubmit = async function () {
+async function handleSubmit() {
     purgeContainers();
     $('.sidebar').toggleClass('show');
     $('.code-editor').toggleClass('reduced');
@@ -80,7 +80,7 @@ let handleSubmit = async function () {
     // handleToast('Submission successful','success');
 }
 
-let handleEventsInAnchor = function () {
+function handleEventsInAnchor() {
     for (let j = 0; j < iFrameLength; j++) {
         originalHREF = iframes[0].contentDocument.querySelectorAll('a');
     }
@@ -106,21 +106,22 @@ $('#save-changes-url').click(() => {
     modifiedCodeUpdate();
 })
 
-let handleHREFTrack = function () {
+function handleHREFTrack() {
     let flag = 0;
     for (let d = 0; d < updatedHREF.length; d++) {
-        let HREFTag = updatedHREF[d].href;
+        let HREFTag = updatedHREF[d].anchor.href;
         if (HREFTag && HREFTag !== regexCall(HREFTag)) {
-            updatedHREF[d].href = regexCall(HREFTag);
+            updatedHREF[d].anchor.href = regexCall(HREFTag);
+            updatedHREF[d].flag = 1;
             modifiedCodeUpdate();
             flag++;
         }
     }
     flag === 0 ? handleToast('No Link changed', 'error') : handleToast('Tracking URL removed successfully', 'success');
-    anchorRefresh();
+    // anchorRefresh();
 }
 
-let regexCall = function (strToMatch) {
+function regexCall(strToMatch) {
     // let regex =  strToMatch.match(new RegExp(/(?<=\[@trackurl%20.*\])(https?:\/\/(?:www\.)?[^\s]+)(?=\?utm)/)); 
     // let regex2 = strToMatch.match(new RegExp(/(?<=\[@trackurl%20.*\])(https?:\/\/(?:www\.)?[^\s]+)(?=\[\/@trackurl\])/));
     // const regex = strToMatch.match(new RegExp(/https?:\/\/[^\s\[\]?]+(?=\[\/@trackurl|\?utm|$)/g));
@@ -134,7 +135,7 @@ let regexCall = function (strToMatch) {
     return strToMatch;
 }
 
-let handleAnchorHighlight = function (evt) {
+function handleAnchorHighlight(evt) {
     $('#save-changes-anchor').addClass('disabled');
     $('.hidden-anchor-modal').click();
     $('#upload-csv').val('');
@@ -156,7 +157,7 @@ let handleAnchorHighlight = function (evt) {
         container.appendChild(iframe);
 
         let inputContainer = document.createElement('div');
-        inputContainer.className = 'input-container';
+        inputContainer.className = 'input-container ms-0';
 
         let currentUrlField = document.createElement('input');
         currentUrlField.type = 'text';
@@ -231,7 +232,7 @@ let handleAnchorHighlight = function (evt) {
     };
 };
 
-let anchorRefresh = function () {
+function anchorRefresh() {
     updatedHREF.forEach((href, index) => {
         let currentUrlField = document.getElementById(`current-anchor-${index + 1}`);
         currentUrlField.value = href.href;
@@ -290,7 +291,7 @@ function handleCSVUpload(event) {
     handleToast('New URLs loaded succesfully', 'success');
 }
 
-let handleImageStorage = function () {
+function handleImageStorage() {
     for (let j = 0; j < iFrameLength; j++) {
         let imgs = iframes[0].contentDocument.querySelectorAll('img');
         let IMGBgelems = iframes[0].contentDocument.getElementsByTagName('td');
@@ -311,7 +312,7 @@ let handleImageStorage = function () {
     }    
 }
 
-let handleImageExtraction = async function () {
+async function handleImageExtraction() {
     $('.hidden-image-modal').click();
     $('#save-changes-img').addClass('disabled');
     let imageModalBody = document.getElementById('inner-image-modal-body');
@@ -411,7 +412,7 @@ let handleImageExtraction = async function () {
                 img.src = newSrc || imageTag.image.src;
                 newSrc ? imageTag.flag = 1 : imageTag.flag = 0;
                 if (newAlt) {
-                    img.setAttribute('alt', newAlt);
+                    img.alt = newAlt;
                 } else {
                     img.removeAttribute('alt');
                 }
@@ -556,13 +557,13 @@ $('#regex-submit').click(() => {
     };
 })
 
-let handleAmpscript = async function () {
+async function handleAmpscript() {
     $('.hidden-personalisation-modal').click();
     let PersonalisationModalBody = document.getElementById('inner-personalisation-modal-body');
     PersonalisationModalBody.innerHTML = '';
 }
 
-let handleCodeCompare = function () {
+function handleCodeCompare() {
     $('#editor-container').toggleClass('some-style');
     $('#modified-code-container').toggleClass('some-style2');
     $('#original-code-container').toggleClass('some-style2 d-none');
@@ -715,7 +716,7 @@ function handleCloseUpload() {
     $('#upload-file').val('');
 }
 
-let purgeContainers = function () {
+function purgeContainers() {
     modifiedCode.value = '';
     disableDownload();
 }
@@ -737,7 +738,7 @@ function line_scroll(ele) {
     document.getElementById(`${ele}-line-counter`).scrollLeft = document.getElementById(`${ele}-file`).scrollLeft;
 }
 
-let handleToggleScreen = function (evt) {
+function handleToggleScreen(evt) {
     if (evt.dataset.bool == 'mobile') {
         $('.wrapper').width('425px');
     }
@@ -746,7 +747,7 @@ let handleToggleScreen = function (evt) {
     }
 }
 
-let handleToast = function (toastMessage, toastType) {
+function handleToast(toastMessage, toastType) {
     $.toast({
         text: toastMessage,
         position: 'bottom-right',
