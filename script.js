@@ -292,13 +292,12 @@ function handleCSVUpload(event) {
 }
 
 function handleImageStorage() {
-    for (let j = 0; j < iFrameLength; j++) {
-        let imgs = iframes[0].contentDocument.querySelectorAll('img');
-        let IMGBgelems = iframes[0].contentDocument.getElementsByTagName('td');
-        originalIMG.push(...imgs);
-        for (let d = 0; d < IMGBgelems.length; d++) {
-            if (IMGBgelems[d].getAttribute('background')) originalIMG.push(IMGBgelems[d].getAttribute('background'));
-        }
+
+    let imgs = iframes[0].contentDocument.querySelectorAll('img');
+    let IMGBgelems = iframes[0].contentDocument.getElementsByTagName('td');
+    originalIMG.push(...imgs);
+    for (let d = 0; d < IMGBgelems.length; d++) {
+        if (IMGBgelems[d].getAttribute('background')) originalIMG.push(IMGBgelems[d].getAttribute('background'));
     }
     for (let j = 1; j < iFrameLength; j++) {
         const images = iframes[1].contentDocument.querySelectorAll('img');
@@ -339,8 +338,8 @@ async function handleImageExtraction() {
         imgContainer.style.background = '#bbbbbb';
 
         let imgElement = document.createElement('img');
-        imgElement.src = originalIMG[index].src;
-        imgElement.alt = originalIMG[index].alt;
+        imgElement.src = originalIMG[index].src || originalIMG[index];
+        imgElement.alt = originalIMG[index].alt || "";
         imgElement.className = 'img-preview';
 
         imgContainer.appendChild(imgElement);
@@ -349,7 +348,7 @@ async function handleImageExtraction() {
 
         let currentImgField = document.createElement('input');
         currentImgField.type = 'text';
-        currentImgField.value = originalIMG[index].src;
+        currentImgField.value = originalIMG[index].src || originalIMG[index];
         currentImgField.readOnly = true;
         currentImgField.id = `current-img-${index + 1}`;
         currentImgField.className = 'current-img form-control';
@@ -367,8 +366,8 @@ async function handleImageExtraction() {
         imgContainerModified.style.background = '#bbbbbb';
 
         let imgElementModified = document.createElement('img');
-        imgElementModified.src = img.flag === 1 ? img.image.src : '';
-        imgElementModified.alt = originalIMG[index].alt;
+        imgElementModified.src = img.flag === 1 ? img.image.src || img.image : '';
+        imgElementModified.alt = originalIMG[index].alt || "";
         imgElementModified.className = 'img-preview';
         imgElementModified.id = `img-preview-${index + 1}`;
 
@@ -379,8 +378,8 @@ async function handleImageExtraction() {
 
         let inputImgField = document.createElement('input');
         inputImgField.type = 'text';
-        inputImgField.value = img.flag === 1 ? img.image.src : '';
-        inputImgField.title = img.flag === 1 ? img.image.src : '';
+        inputImgField.value = img.flag === 1 ? img.image.src || img.image : '';
+        inputImgField.title = img.flag === 1 ? img.image.src || img.image : '';
         inputImgField.id = `input-img-${index + 1}`;
         inputImgField.placeholder = 'Enter new src';
         inputImgField.className = 'new-img form-control';
@@ -392,7 +391,7 @@ async function handleImageExtraction() {
         altField.id = `alt-img-${index+1}`;
         altField.placeholder = 'Enter alt text';
         altField.className = 'alt-url form-control';
-        altField.value = img.image.alt;
+        altField.value = img.image.alt || "";
         altField.addEventListener('keyup', () => $('#save-changes-img').removeClass('disabled'));
         inputContainer.appendChild(altField);
 
@@ -406,23 +405,33 @@ async function handleImageExtraction() {
             let newSrc = document.getElementById(`input-img-${idx + 1}`).value.trim();
             let newAlt = document.getElementById(`alt-img-${idx + 1}`).value.trim();
             let mainIframe = document.getElementById('modified-iframe');
-            let img = mainIframe.contentDocument.querySelector(`img[src='${originalIMG[idx].src}']`);
+            let img = mainIframe.contentDocument.querySelector(`img[src='${updatedIMG[idx].image.src}']`);
     
             if (img && img.hasAttribute('src')) {
                 img.src = newSrc || imageTag.image.src;
                 newSrc ? imageTag.flag = 1 : imageTag.flag = 0;
+                imageTag.image.src = newSrc ? newSrc : imageTag.image.src;
                 if (newAlt) {
                     img.alt = newAlt;
                 } else {
                     img.removeAttribute('alt');
                 }
+                modifiedCodeUpdate();
+            }
+            else if(imageTag.background === true) {
+                let updatedCode = modifiedCode.value;
+                updatedCode = newSrc ? updatedCode.replaceAll(originalIMG[idx], newSrc) : updatedCode;
+                modifiedCode.value = HTMLDocStandard + '\n' + updatedCode;
+                modifiedIframeCodeUpdate(modifiedCode.value);
+                newSrc ? imageTag.flag = 1 : imageTag.flag = 0;
+                imageTag.image = newSrc ? newSrc : imageTag.image;
             }
         });
         handleToast('Changes saved successfully', 'success');
-        modifiedCodeUpdate();
+        // modifiedCodeUpdate();
     };
     $('.new-img').keyup(function (){
-        let idx = $(this).attr('id').slice(-1);
+        let idx = $(this).attr('id').match(/\d+$/)[0];
         if($(this).val() === ''){
             $(`#img-container-${idx}`).addClass('invisible');
         }
