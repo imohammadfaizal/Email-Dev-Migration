@@ -66,8 +66,8 @@
                     <li class="side-menu py-2 ps-4 border-bottom bg-purple">
                         <div class="d-flex gap-3">
                             <div class="d-flex flex-column">
-                                <!-- <div class="pt-2" style="color: white; font-size: 20px;" >File Name</div> -->
                                 <div class="fw-bold text-light" style="font-size: 19px; line-height: 29px;" >Current File ESP</div>
+                                <div class="text-light" id="file-name" style="font-size: 19px; line-height: 29px;" ></div>
                             </div>
                         </div>
                     </li>
@@ -137,9 +137,9 @@
                         </li>
                       </ul>
                 </div>
-                <div class="inner-header-button-container d-flex justify-content-around d-none border rounded-top">
+                <div class="inner-header-button-proxy-container d-flex justify-content-around d-none border rounded-top">
                     <div class="fw-bold fs-5 d-none inner-original-btn color-purple" >Original</div>
-                    <div class="fw-bold fs-5 color-purple" >Modified</div>
+                    <div class="fw-bold fs-5 d-none inner-modified-btn color-purple" >Modified</div>
                 </div>
                 <div id="editor-container" class="position-relative tab-menu editor w-100 position-relative" style="flex-grow: 1;">
                     <div class="h-100" id="original-code-container">

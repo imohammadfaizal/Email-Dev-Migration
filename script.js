@@ -13,6 +13,7 @@ let originalHREF;
 let updatedHREF = [];
 let originalIMG =[];
 let updatedIMG = [];
+let HTMLFileName;
 let newUrl;
 let fileToUpload;
 document.getElementById('upload-file').addEventListener('change', handleFileUpload, false);
@@ -64,7 +65,8 @@ async function handleSubmit() {
     $('.sidebar').toggleClass('show');
     $('.code-editor').toggleClass('reduced');
     $('.nav-tabs').toggleClass('show');
-    $('.header-button-container, .inner-header-button-container').toggleClass('d-none');
+    $('.header-button-container, .inner-header-button-proxy-container').toggleClass('d-none');
+    $('.inner-header-button-proxy-container').removeClass('inner-header-button-container');
     $('.logo-container').toggleClass('show');
     $('#submit-container').toggleClass('d-none');
     $('#original-file').attr('readonly');
@@ -77,6 +79,7 @@ async function handleSubmit() {
     line_counter('modified');
     handleEventsInAnchor();
     handleImageStorage();
+    $("#file-name").text(HTMLFileName);
     // handleToast('Submission successful','success');
 }
 
@@ -580,7 +583,8 @@ function handleCodeCompare() {
     $('#editor-container').toggleClass('some-style');
     $('#modified-code-container').toggleClass('some-style2');
     $('#original-code-container').toggleClass('some-style2 d-none');
-    $('#original-wrapper, .inner-original-btn').toggleClass('d-none');
+    $('#original-wrapper, .inner-original-btn, .inner-modified-btn').toggleClass('d-none');
+    $('.inner-header-button-proxy-container').toggleClass('inner-header-button-container');
 }
 
 $('.download-btn').click(function (e) {
@@ -658,18 +662,19 @@ function handleFileUpload(evt) {
 
 $('#save-changes-upload').click(() => {
     readFile(fileToUpload);
+    HTMLFileName = fileToUpload.name;
     handleToast(`${fileToUpload.name} is uploaded successfully`, 'success')
     $('.sidebar').toggleClass('show');
     $('.code-editor').toggleClass('reduced');
     $('.nav-tabs').toggleClass('show');
-    $('.header-button-container, .inner-header-button-container').toggleClass('d-none');
+    $('.header-button-container, .inner-header-button-proxy-container').toggleClass('d-none');
     $('.logo-container').toggleClass('show');
     $('#submit-container').toggleClass('d-none');
 
     $('#editor-container').removeClass('some-style');
     $('#original-code-container, #modified-code-container').removeClass('some-style2');
     $('#original-code-container').removeClass('d-none');
-    $('#modified-code-container, #original-wrapper, .inner-original-btn').addClass('d-none');
+    $('#modified-code-container, #original-wrapper, .inner-original-btn, .inner-modified-btn').addClass('d-none');
 
     $('.nav-link').removeClass('active');
     $('.code-btn').addClass('active');
@@ -679,6 +684,7 @@ $('#save-changes-upload').click(() => {
 })
 
 async function readFile(file) {
+    HTMLFileName = file.name;
     return new Promise((resolve, reject) => {
         let reader = new FileReader();
         reader.onload = (event) => {
