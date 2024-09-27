@@ -221,15 +221,11 @@ body, html{
 .side-menu-label{
     font-size: 18px;
     line-height: 22px;
-    color: #8A226F; 
     font-family: open sans, Arial, Helvetica, sans-serif;
 }
 .content-container{
     flex: 1 1 auto;
     overflow: hidden;
-}
-.nav-link{
-    color: #8A226F;
 }
 .nav-link:hover {
     color: #8A226F;
@@ -308,14 +304,10 @@ body, html{
     justify-content: center;
     
 }
-.save-changes-btn{
-    background-color: #8A226F;
-    color: #ffffff;
-}
 .save-changes-btn:hover{
-    color: #ffffff;
-    background-color: #7f4e71;
-    border-color: #565e64;
+    color: #ffffff !important;
+    background-color: #7f4e71 !important;
+    border-color: #565e64 !important;
 }
 .save-changes-btn.disabled, .save-changes-btn:disabled {
     color: #fff;
@@ -350,6 +342,9 @@ body, html{
 }
 .border-purple{
     border-color: #8A226F !important;
+}
+.bg-purple{
+    background-color: #8A226F !important;
 }
 #upload-new-file{
     height: 35px;

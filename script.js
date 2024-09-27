@@ -161,8 +161,10 @@ function handleAnchorHighlight(evt) {
 
         let currentUrlField = document.createElement('input');
         currentUrlField.type = 'text';
-        currentUrlField.value = originalHREF[index];
-        currentUrlField.title = originalHREF[index];
+        let hrefOLink = originalHREF[index].getAttribute('href');
+        hrefOLink && !/^(http|https):\/\//i.test(hrefOLink) ? currentUrlField.value = currentUrlField.title = hrefOLink : currentUrlField.value = currentUrlField.title = hrefOLink;
+        // currentUrlField.value = originalHREF[index];
+        // currentUrlField.title = originalHREF[index];
         currentUrlField.readOnly = true;
         currentUrlField.id = `current-anchor-${index + 1}`;
         currentUrlField.className = 'current-url form-control';
@@ -170,8 +172,10 @@ function handleAnchorHighlight(evt) {
 
         let inputField = document.createElement('input');
         inputField.type = 'text';
-        inputField.value = href.flag === 1 ? href.anchor.href : '';
-        inputField.title = href.flag === 1 ? href.anchor.href : '';
+        let hrefMLink = href.anchor.getAttribute('href');
+        hrefMLink && !/^(http|https):\/\//i.test(hrefMLink) ? inputField.value = inputField.title = href.flag === 1 ? hrefMLink : '' : inputField.value = inputField.title = href.flag === 1 ? hrefMLink : '' ;
+        // inputField.value = href.flag === 1 ? href.anchor.href : '';
+        // inputField.title = href.flag === 1 ? href.anchor.href : '';
         inputField.id = `input-anchor-${index + 1}`;
         inputField.placeholder = 'Enter new href';
         inputField.className = 'new-url form-control';
@@ -727,6 +731,10 @@ function handleCloseUpload() {
 
 function purgeContainers() {
     modifiedCode.value = '';
+    originalHREF = [];
+    updatedHREF = [];
+    originalIMG = [];
+    updatedIMG = [];
     disableDownload();
 }
 
