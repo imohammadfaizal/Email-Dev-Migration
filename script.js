@@ -141,7 +141,7 @@ function regexCall(strToMatch) {
 function handleAnchorHighlight(evt) {
     $('#save-changes-anchor').addClass('disabled');
     $('.hidden-anchor-modal').click();
-    $('#upload-csv').val('');
+    // $('#upload-csv').val('');
     let anchorModalBody = document.getElementById('inner-anchor-modal-body');
     anchorModalBody.innerHTML = '';
 
@@ -247,7 +247,8 @@ function anchorRefresh() {
     })
 }
 
-function handleCSVUpload(event) {
+async function handleCSVUpload(event) {
+    await handleAnchorHighlight();
     const file = event.target.files[0];
     if (file.type !== 'text/csv') {
         handleToast('Please upload a valid CSV file', 'error');

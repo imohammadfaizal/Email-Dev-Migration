@@ -94,7 +94,10 @@
                                 <div class="side-menu-label color-purple fw-bold">Links</div>
                                 <div class="side-menu-label color-purple text-decoration-underline pt-1 cursor-pointer" onclick="handleAnchorHighlight()" class="btn btn-dark"
                                 title="Highlights all the Anchor tag in the code">Manual Update</div>
-                                <div class="side-menu-label color-purple text-decoration-underline pt-1 cursor-pointer" >Document Upload</div>
+                                <div class="side-menu-label color-purple text-decoration-underline pt-1 cursor-pointer position-relative" >Document Upload
+                                    <input type="file" class="form-control cursor-pointer position-absolute top-0 start-0 opacity-0 w-100" id="upload-csv" aria-describedby="upload-btn"
+                                    aria-label="Upload" >
+                                </div>
                             </div>
                         </div>
                     </li>
@@ -280,10 +283,10 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Link Updates</h5>
                         <div class="d-flex gap-5 align-items-center">
-                            <div class="input-group" style="width: auto;" >
+                            <!-- <div class="input-group" style="width: auto;" >
                                 <input type="file" class="form-control" id="upload-csv" aria-describedby="upload-btn"
                                     aria-label="Upload" >
-                            </div>
+                            </div> -->
                             <!-- <button onclick="handleHREFTrack()" class="btn btn-dark" title="Removes Tracking URL from HREF Attribute">Remove Tracking URL</button> -->
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="handleCloseUpload()"></button>
                         </div>
