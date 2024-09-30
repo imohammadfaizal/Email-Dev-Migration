@@ -11,7 +11,7 @@ let iframes = document.getElementsByTagName('iframe');
 let iFrameLength = iframes.length;
 let originalHREF;
 let updatedHREF = [];
-let originalIMG =[];
+let originalIMG = [];
 let updatedIMG = [];
 let HTMLFileName;
 let newUrl;
@@ -23,8 +23,10 @@ $('#original-file').keyup(() => {
     if ($('#original-file').val()) {
         $('#submit-btn').removeClass('disabled');
         $('#dummy-wrapper').addClass('d-none');
+        $('#upload-container').addClass('d-none');
     }
     else {
+        $('#upload-container').removeClass('d-none');
         $('#submit-btn').addClass('disabled')
     }
 })
@@ -80,6 +82,7 @@ async function handleSubmit() {
     handleEventsInAnchor();
     handleImageStorage();
     $("#file-name").text(HTMLFileName);
+    $("#drop-container").addClass('d-none');
     // handleToast('Submission successful','success');
 }
 
@@ -620,15 +623,7 @@ function dropOverDropzone(evt) {
         let item = evt.dataTransfer.items[0]
         if (item.kind === 'file' && item.type === 'text/html') {
             const file = item.getAsFile();
-            if (originalCode.value !== '') {
-                $('.hidden-upload-modal').click(() => {
-                    fileToUpload = file;
-                });
-                $('.hidden-upload-modal').click();
-            }
-            else {
-                readFile(file);
-            }
+            readFile(file);
             $('#upload-container').addClass('d-none');
         }
         else {
@@ -664,7 +659,11 @@ function handleFileUpload(evt) {
 $('#save-changes-upload').click(() => {
     readFile(fileToUpload);
     HTMLFileName = fileToUpload.name;
-    handleToast(`${fileToUpload.name} is uploaded successfully`, 'success')
+    handleToast(`${fileToUpload.name} is uploaded successfully`, 'success');
+    $("#drop-container").removeClass('d-none');
+    $('#drop-animation').addClass('d-none');
+    $('#drop-zone').css('zIndex', -1);
+    $('#dummy-wrapper').removeClass('d-none');
     $('.sidebar').toggleClass('show');
     $('.code-editor').toggleClass('reduced');
     $('.nav-tabs').toggleClass('show');

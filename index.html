@@ -155,14 +155,14 @@
                                 ondragover="dragOverTextarea(event);"></textarea>
                         </div>
                         <div id="upload-container">
-                            <div class="position-absolute top-0 w-100 h-100" ondragover="dragOverTextarea(event);">
-                                <div class="position-absolute bottom-50 start-50 fw-bolder translate-middle"><div class="input-group">
+                            <div class="position-absolute top-50 start-50" ondragover="dragOverTextarea(event);">
+                                <div class="position-absolute bottom-50 start-50 fw-bolder translate-middle" style="width: 325px;"><div class="input-group">
                                     <input type="file" class="form-control rounded-pill" id="upload-file" aria-describedby="upload-btn"
                                         aria-label="Upload">
                                 </div></div>
                             </div>
                         </div>
-                        <div>
+                        <div id="drop-container">
                             <div id="drop-zone" class="position-absolute w-100 h-100 top-0"
                                 ondrop="dropOverDropzone(event);" ondragover="dragOverDropzone(event);"
                                 ondragleave="dragLeaveDropzone(event)">
