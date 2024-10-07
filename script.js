@@ -13,6 +13,7 @@ let originalHREF;
 let updatedHREF = [];
 let originalIMG = [];
 let updatedIMG = [];
+let duplicates = [];
 let HTMLFileName;
 let newUrl;
 let fileToUpload;
@@ -306,7 +307,8 @@ function handleImageStorage() {
 
     let imgs = iframes[0].contentDocument.querySelectorAll('img');
     let IMGBgelems = iframes[0].contentDocument.getElementsByTagName('td');
-    originalIMG.push(...imgs);
+    imgs.forEach(item => originalIMG.push(item.src));
+    duplicates = originalIMG.filter((item, index) => originalIMG.indexOf(item) !== index);
     for (let d = 0; d < IMGBgelems.length; d++) {
         if (IMGBgelems[d].getAttribute('background')) originalIMG.push(IMGBgelems[d].getAttribute('background'));
     }
@@ -359,7 +361,7 @@ async function handleImageExtraction() {
 
         let currentImgField = document.createElement('input');
         currentImgField.type = 'text';
-        currentImgField.value = originalIMG[index].src || originalIMG[index];
+        currentImgField.value = currentImgField.title = originalIMG[index].src || originalIMG[index];
         currentImgField.readOnly = true;
         currentImgField.id = `current-img-${index + 1}`;
         currentImgField.className = 'current-img form-control';
@@ -389,12 +391,25 @@ async function handleImageExtraction() {
 
         let inputImgField = document.createElement('input');
         inputImgField.type = 'text';
-        inputImgField.value = img.flag === 1 ? img.image.src || img.image : '';
-        inputImgField.title = img.flag === 1 ? img.image.src || img.image : '';
+        inputImgField.value = inputImgField.title = img.flag === 1 ? img.image.src || img.image : '';
         inputImgField.id = `input-img-${index + 1}`;
         inputImgField.placeholder = 'Enter new src';
         inputImgField.className = 'new-img form-control';
-        inputImgField.addEventListener('keyup', () => $('#save-changes-img').removeClass('disabled'));
+        inputImgField.addEventListener('keyup', () => {
+            $('#save-changes-img').removeClass('disabled');
+            let curr = $('#current-img-' + (index + 1)).val();
+            let newVal = $('#input-img-' + (index + 1)).val();
+            if(duplicates.includes(curr))
+                {
+                    $('.current-img').filter((index, item) => {
+                        return $(item).val() == curr;
+                    }).map((index, item) => {
+                        let idx = $(item).attr('id').match(/\d+$/)[0];
+                        $('#input-img-' + idx).val(newVal);
+                    })
+                    $('.new-img').trigger('keyup');
+                }
+            });
         inputContainer.appendChild(inputImgField);
 
         let altField = document.createElement('input');
@@ -514,7 +529,6 @@ $('#regex-submit').click(() => {
 
     let fragment = document.createDocumentFragment();
 
-    console.log(regexMatches);
     if (regexMatches == null || regexMatches.length == 0) {
         $('#inner-personalisation-modal-body').html('No Results Found')
     }
@@ -663,7 +677,6 @@ $('#save-changes-upload').click(() => {
     $("#drop-container").removeClass('d-none');
     $('#drop-animation').addClass('d-none');
     $('#drop-zone').css('zIndex', -1);
-    $('#dummy-wrapper').removeClass('d-none');
     $('.sidebar').toggleClass('show');
     $('.code-editor').toggleClass('reduced');
     $('.nav-tabs').toggleClass('show');
