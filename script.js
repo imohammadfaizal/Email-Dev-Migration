@@ -180,7 +180,7 @@ function handleAnchorHighlight(evt) {
         let inputField = document.createElement('input');
         inputField.type = 'text';
         let hrefMLink = href.anchor.getAttribute('href');
-        hrefMLink && !/^(http|https):\/\//i.test(hrefMLink) ? inputField.value = inputField.title = href.flag === 1 ? hrefMLink : '' : inputField.value = inputField.title = href.flag === 1 ? hrefMLink : '' ;
+        hrefMLink && !/^(http|https):\/\//i.test(hrefMLink) ? inputField.value = inputField.title = href.flag === 1 ? hrefMLink : '' : inputField.value = inputField.title = href.flag === 1 ? hrefMLink : '';
         // inputField.value = href.flag === 1 ? href.anchor.href : '';
         // inputField.title = href.flag === 1 ? href.anchor.href : '';
         inputField.id = `input-anchor-${index + 1}`;
@@ -321,7 +321,7 @@ function handleImageStorage() {
         for (let d = 0; d < IMGBgelems.length; d++) {
             if (IMGBgelems[d].getAttribute('background')) updatedIMG.push({ image: IMGBgelems[d].getAttribute('background'), flag: 0, background: true });
         }
-    }    
+    }
 }
 
 async function handleImageExtraction() {
@@ -331,7 +331,7 @@ async function handleImageExtraction() {
     imageModalBody.innerHTML = '';
 
     let fragment = document.createDocumentFragment();
-    
+
     updatedIMG.forEach((img, index) => {
 
         let container = document.createElement('div');
@@ -399,22 +399,21 @@ async function handleImageExtraction() {
             $('#save-changes-img').removeClass('disabled');
             let curr = $('#current-img-' + (index + 1)).val();
             let newVal = $('#input-img-' + (index + 1)).val();
-            if(duplicates.includes(curr))
-                {
-                    $('.current-img').filter((index, item) => {
-                        return $(item).val() == curr;
-                    }).map((index, item) => {
-                        let idx = $(item).attr('id').match(/\d+$/)[0];
-                        $('#input-img-' + idx).val(newVal);
-                    })
-                    $('.new-img').trigger('keyup');
-                }
-            });
+            if (duplicates.includes(curr)) {
+                $('.current-img').filter((index, item) => {
+                    return $(item).val() == curr;
+                }).each((index, item) => {
+                    let idx = $(item).attr('id').match(/\d+$/)[0];
+                    $('#input-img-' + idx).val(newVal);
+                })
+                $('.new-img').trigger('keyup');
+            }
+        });
         inputContainer.appendChild(inputImgField);
 
         let altField = document.createElement('input');
         altField.type = 'text';
-        altField.id = `alt-img-${index+1}`;
+        altField.id = `alt-img-${index + 1}`;
         altField.placeholder = 'Enter alt text';
         altField.className = 'alt-url form-control';
         altField.value = img.image.alt || "";
@@ -427,12 +426,12 @@ async function handleImageExtraction() {
     imageModalBody.appendChild(fragment);
 
     document.getElementById('save-changes-img').onclick = function () {
-        updatedIMG.forEach((imageTag,idx) => {
+        updatedIMG.forEach((imageTag, idx) => {
             let newSrc = document.getElementById(`input-img-${idx + 1}`).value.trim();
             let newAlt = document.getElementById(`alt-img-${idx + 1}`).value.trim();
             let mainIframe = document.getElementById('modified-iframe');
             let img = mainIframe.contentDocument.querySelector(`img[src='${updatedIMG[idx].image.src}']`);
-    
+
             if (img && img.hasAttribute('src')) {
                 img.src = newSrc || imageTag.image.src;
                 newSrc ? imageTag.flag = 1 : imageTag.flag = 0;
@@ -444,7 +443,7 @@ async function handleImageExtraction() {
                 }
                 modifiedCodeUpdate();
             }
-            else if(imageTag.background === true) {
+            else if (imageTag.background === true) {
                 let updatedCode = modifiedCode.value;
                 updatedCode = newSrc ? updatedCode.replaceAll(originalIMG[idx], newSrc) : updatedCode;
                 modifiedCode.value = HTMLDocStandard + '\n' + updatedCode;
@@ -456,13 +455,13 @@ async function handleImageExtraction() {
         handleToast('Changes saved successfully', 'success');
         // modifiedCodeUpdate();
     };
-    $('.new-img').keyup(function (){
+    $('.new-img').keyup(function () {
         let idx = $(this).attr('id').match(/\d+$/)[0];
-        if($(this).val() === ''){
+        if ($(this).val() === '') {
             $(`#img-container-${idx}`).addClass('invisible');
         }
-        else{
-            $(`#img-preview-${idx}`).attr('src' , $(this).val());
+        else {
+            $(`#img-preview-${idx}`).attr('src', $(this).val());
             $(`#img-container-${idx}`).removeClass('invisible');
         }
     })
