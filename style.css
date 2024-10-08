@@ -357,4 +357,5 @@ body, html{
 
 .modal-heading{
     box-shadow: 0 0 10px 0 hsla(0, 0%, 7%, .06), 0 10px 28px 0 hsla(0, 0%, 7%, .04);
+    padding-bottom: 5px;
 }
