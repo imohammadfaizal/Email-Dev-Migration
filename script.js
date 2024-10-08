@@ -252,7 +252,6 @@ function anchorRefresh() {
 }
 
 async function handleCSVUpload(event) {
-    await handleAnchorHighlight();
     const file = event.target.files[0];
     if (file.type !== 'text/csv') {
         handleToast('Please upload a valid CSV file', 'error');
@@ -262,6 +261,7 @@ async function handleCSVUpload(event) {
 
     const reader = new FileReader();
     reader.onload = function (e) {
+        handleAnchorHighlight();
         const text = e.target.result;
         const rows = text.split('\n').map(row => row.split(','));
 
@@ -529,7 +529,22 @@ $('#regex-submit').click(() => {
     let fragment = document.createDocumentFragment();
 
     if (regexMatches == null || regexMatches.length == 0) {
-        $('#inner-personalisation-modal-body').html('No Results Found')
+        $('#inner-personalisation-modal-body').html(`<div class="h-100 d-flex justify-content-center align-items-center flex-column text-secondary">
+            <div class="w-100 d-flex flex-column align-items-center">
+            <div class="d-flex flex-column " style="width: 170px;">
+                <div style="line-height: 30px;" class="d-flex justify-content-around">
+                    <div class="fs-1 fw-bolder">x</div>
+                    <div class="fs-1 fw-bolder">x</div>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="fs-1 fw-bolder">&lt;</div>
+                </div>
+                <div style="line-height: 30px;" class="d-flex justify-content-center">
+                    <div class="fs-1 fw-bolder">o</div>
+                </div>
+            </div>
+            <div class="fs-1 fw-bold d-flex justify-content-center pt-3"><span>No Results Found!!</span></div>
+        </div></div>`)
     }
     else {
         regexMatches.forEach((script, idx) => {
